@@ -21,6 +21,7 @@ export default function HeroScene() {
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
     // Open-Meteo Integration via Geolocation Context
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(async (pos) => {
@@ -28,7 +29,7 @@ export default function HeroScene() {
           const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current_weather=true`);
           const data = await res.json();
           // WMO Weather codes 51-99 indicates Rain, Showers, and Thunderstorms
-          if (data && data.current_weather && data.current_weather.weathercode >= 51) {
+          if (data && data.current_weather && data.current_weather.weathercode >= 51 && isMounted) {
             setIsRaining(true);
           }
         } catch { /* Suppress net err if offline */ }
@@ -36,6 +37,7 @@ export default function HeroScene() {
          // Silently failed geolocating. Just default to no rain.
       });
     }
+    return () => { isMounted = false; };
   }, []);
 
   return (

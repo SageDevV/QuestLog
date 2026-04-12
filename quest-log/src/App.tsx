@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useStore } from './store';
 import confetti from 'canvas-confetti';
 import HeroPanel from './components/HeroPanel';
@@ -36,32 +36,41 @@ export default function App() {
       audio.play().catch(() => {});
       audio.onended = () => { bgResume(); }
 
-      const duration = 2500;
-      const end = Date.now() + duration;
-      const frame = () => {
-        confetti({ particleCount: 15, angle: 60, spread: 80, origin: { x: 0 }, colors: ['#e94560', '#facc15'], zIndex: 10000 });
-        confetti({ particleCount: 15, angle: 120, spread: 80, origin: { x: 1 }, colors: ['#00e5ff', '#ffffff'], zIndex: 10000 });
-        if (Date.now() < end) requestAnimationFrame(frame);
-      };
-      frame();
+      // Optimize confetti: fire 4 bursts instead of a heavy CPU loop
+      let burstCount = 0;
+      const interval = setInterval(() => {
+        confetti({ particleCount: 50, angle: 60, spread: 80, origin: { x: 0, y: 0.7 }, colors: ['#e94560', '#facc15'], zIndex: 10000 });
+        confetti({ particleCount: 50, angle: 120, spread: 80, origin: { x: 1, y: 0.7 }, colors: ['#00e5ff', '#ffffff'], zIndex: 10000 });
+        burstCount++;
+        if (burstCount >= 4) clearInterval(interval);
+      }, 500);
+
       setTimeout(clearLevelUpMsg, 3500);
+      
+      return () => clearInterval(interval);
     }
   }, [levelUpMsg, clearLevelUpMsg]);
 
-  // Filter derivations
-  const filtered = quests.filter(q => filter === 'active' ? !q.completed : q.completed)
-    .filter(q => {
-      if (filter !== 'active' || recurrenceFilter === 'all') return true;
-      return (q.recurrenceType || 'single') === recurrenceFilter;
-    });
+  // Filter derivations - Optimized with useMemo
+  const filtered = useMemo(() => {
+    return quests.filter(q => filter === 'active' ? !q.completed : q.completed)
+      .filter(q => {
+        if (filter !== 'active' || recurrenceFilter === 'all') return true;
+        return (q.recurrenceType || 'single') === recurrenceFilter;
+      });
+  }, [quests, filter, recurrenceFilter]);
 
-  const todayStart = new Date(); todayStart.setHours(0,0,0,0);
-  const todayTs = todayStart.getTime();
-  const tomorrowTs = todayTs + 86400000;
-  const dayAfterTs = tomorrowTs + 86400000;
+  const { todayQuests, tomorrowQuests } = useMemo(() => {
+    const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+    const todayTs = todayStart.getTime();
+    const tomorrowTs = todayTs + 86400000;
+    const dayAfterTs = tomorrowTs + 86400000;
 
-  const todayQuests = quests.filter(q => !q.completed && q.scheduledDate >= todayTs && q.scheduledDate < tomorrowTs);
-  const tomorrowQuests = quests.filter(q => !q.completed && q.scheduledDate >= tomorrowTs && q.scheduledDate < dayAfterTs);
+    return {
+      todayQuests: quests.filter(q => !q.completed && q.scheduledDate >= todayTs && q.scheduledDate < tomorrowTs),
+      tomorrowQuests: quests.filter(q => !q.completed && q.scheduledDate >= tomorrowTs && q.scheduledDate < dayAfterTs)
+    };
+  }, [quests]);
 
   return (
     <>
@@ -70,11 +79,11 @@ export default function App() {
       <ButtonClickSound />
       
       {/* Background unlock logic check */}
-      {(hero.bgUnlocked.includes('Estilo: Crimson Ninja (Vermelho)')) && <div style={{position:'fixed', inset:0, background:'rgba(200, 0, 0, 0.2)', pointerEvents:'none', zIndex:1, mixBlendMode:'overlay'}} />}
-      {(hero.bgUnlocked.includes('Estilo: Matrix Hacker (Verde)')) && <div style={{position:'fixed', inset:0, background:'rgba(0, 200, 50, 0.2)', pointerEvents:'none', zIndex:1, mixBlendMode:'overlay'}} />}
+      {(hero.bgUnlocked.includes('Estilo: Crimson Ninja (Vermelho)')) && <div style={{position:'fixed', inset:0, background:'rgba(200, 0, 0, 0.15)', pointerEvents:'none', zIndex:1}} />}
+      {(hero.bgUnlocked.includes('Estilo: Matrix Hacker (Verde)')) && <div style={{position:'fixed', inset:0, background:'rgba(0, 200, 50, 0.15)', pointerEvents:'none', zIndex:1}} />}
 
       <div className="app" style={{ zIndex:10 }}>
-        <h1 className="app-title">QuestLog 2.0</h1>
+        <h1 className="app-title">QuestLog</h1>
 
         {levelUpMsg && <div className="level-up-toast">{levelUpMsg}</div>}
 
