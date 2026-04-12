@@ -1,0 +1,117 @@
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { Quest, Hero, DIFFICULTY_CONFIG, getTitle } from './types';
+
+// Default initial state
+const defaultHero = (): Hero => ({
+  name: 'X', level: 1, xp: 0, xpToNext: 100, gold: 0, 
+  questsCompleted: 0, title: '🔋 Rookie', inventory: [], bgUnlocked: []
+});
+
+interface AppState {
+  hero: Hero;
+  quests: Quest[];
+  levelUpMsg: string;
+  
+  // Actions
+  setHeroName: (name: string) => void;
+  resetHero: () => void;
+  addQuest: (q: Quest | Quest[]) => void;
+  deleteQuest: (id: string) => void;
+  deleteAllMatching: (id: string) => void;
+  completeQuestAction: (id: string) => { leveledUp: boolean, isAllDayDone: boolean };
+  clearLevelUpMsg: () => void;
+  buyShopItem: (cost: number, itemName: string, isBg?: boolean) => boolean;
+}
+
+export const useStore = create<AppState>()(
+  persist(
+    (set, get) => ({
+      hero: defaultHero(),
+      quests: [],
+      levelUpMsg: '',
+
+      setHeroName: (name) => set((s) => ({ hero: { ...s.hero, name } })),
+      resetHero: () => set((s) => ({ hero: { ...defaultHero(), name: s.hero.name } })),
+      
+      addQuest: (questOrQuests) => {
+        const arr = Array.isArray(questOrQuests) ? questOrQuests : [questOrQuests];
+        set((s) => ({ quests: [...arr, ...s.quests] }));
+      },
+      
+      deleteQuest: (id) => set((s) => ({ quests: s.quests.filter(q => q.id !== id) })),
+      
+      deleteAllMatching: (id) => {
+        set((s) => {
+          const target = s.quests.find(q => q.id === id);
+          if (!target) return s;
+          return {
+            quests: s.quests.filter(q =>
+              !(q.title === target.title &&
+                q.difficulty === target.difficulty &&
+                (q.recurrenceType || 'single') === (target.recurrenceType || 'single') &&
+                (q.recurrenceType || 'single') !== 'single')
+            )
+          };
+        });
+      },
+
+      buyShopItem: (cost, itemName, isBg) => {
+        const { hero } = get();
+        if (hero.gold >= cost) {
+          set((s) => ({
+            hero: {
+              ...s.hero,
+              gold: s.hero.gold - cost,
+              inventory: isBg ? s.hero.inventory : [...s.hero.inventory, itemName],
+              bgUnlocked: isBg ? [...s.hero.bgUnlocked, itemName] : s.hero.bgUnlocked
+            }
+          }));
+          return true;
+        }
+        return false;
+      },
+
+      completeQuestAction: (id) => {
+        const state = get();
+        const quest = state.quests.find(q => q.id === id);
+        if (!quest) return { leveledUp: false, isAllDayDone: false };
+
+        const config = DIFFICULTY_CONFIG[quest.difficulty];
+        let newHero = { ...state.hero };
+        newHero.xp += config.xp;
+        let leveledUp = false;
+
+        while (newHero.xp >= newHero.xpToNext) {
+          newHero.xp -= newHero.xpToNext;
+          newHero.level++;
+          newHero.xpToNext = Math.floor(newHero.xpToNext * 1.3);
+          leveledUp = true;
+        }
+
+        newHero.gold += config.gold;
+        newHero.questsCompleted++;
+        newHero.title = getTitle(newHero.level);
+
+        const newQuests = state.quests.map(q => q.id === id ? { ...q, completed: true, completedAt: Date.now() } : q);
+        
+        let localMessage = leveledUp ? `⚡ Level Up! Você alcançou o nível ${newHero.level}! Novo título: ${newHero.title}` : '';
+
+        const dayStart = new Date(quest.scheduledDate);
+        dayStart.setHours(0, 0, 0, 0);
+        const dayTs = dayStart.getTime();
+        const dayEnd = dayTs + 86400000;
+        const dayQuests = newQuests.filter(q => q.scheduledDate >= dayTs && q.scheduledDate < dayEnd);
+        const isAllDayDone = dayQuests.length > 0 && dayQuests.every(q => q.completed);
+
+        set({ hero: newHero, quests: newQuests, levelUpMsg: localMessage });
+        return { leveledUp, isAllDayDone };
+      },
+
+      clearLevelUpMsg: () => set({ levelUpMsg: '' })
+    }),
+    {
+      name: 'questlog-global-storage',
+    }
+  )
+);
