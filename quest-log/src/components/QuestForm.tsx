@@ -7,21 +7,33 @@ const WEEKDAY_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 const RECURRENCE_OPTIONS: { type: RecurrenceType; label: string }[] = [ { type: 'single', label: 'Única' }, { type: 'daily', label: 'Diária' }, { type: 'weekly', label: 'Semanal' } ];
 const TAGS: QuestTag[] = ['💪 Saúde' , '📚 Estudo' , '💼 Trabalho' , '🎮 Lazer' , '🧙 Magia' , '🗡️ Combate' , '🌎 Explorar'];
 
-export default function QuestForm() {
+export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Quest, onCancel?: () => void }) {
   const addQuest = useStore(s => s.addQuest);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [difficulty, setDifficulty] = useState<QuestDifficulty>('medium');
-  const [tag, setTag] = useState<QuestTag>('💪 Saúde');
-  const [scheduledDate, setScheduledDate] = useState(new Date().toISOString().split('T')[0]);
-  const [open, setOpen] = useState(false);
-  const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>('single');
-  const [selectedWeekdays, setSelectedWeekdays] = useState<number[]>([]);
+  const updateQuest = useStore(s => s.updateQuest);
+  const updateAllMatching = useStore(s => s.updateAllMatching);
+
+  const [title, setTitle] = useState(initialQuest?.title || '');
+  const [description, setDescription] = useState(initialQuest?.description || '');
+  const [difficulty, setDifficulty] = useState<QuestDifficulty>(initialQuest?.difficulty || 'medium');
+  const [tag, setTag] = useState<QuestTag>(initialQuest?.tag || '💪 Saúde');
+  const [scheduledDate, setScheduledDate] = useState(
+    initialQuest ? new Date(initialQuest.scheduledDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+  );
+  const [open, setOpen] = useState(!!initialQuest);
+  const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>(initialQuest?.recurrenceType || 'single');
+  const [selectedWeekdays, setSelectedWeekdays] = useState<number[]>([]); // Note: recurrence editing is simplified here
   const [formError, setFormError] = useState<string | null>(null);
+  const [applyToAll, setApplyToAll] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (initialQuest) {
+      const updates = { title: title.trim(), description: description.trim(), difficulty, tag, scheduledDate: new Date(scheduledDate + 'T12:00:00').getTime() };
+      if (applyToAll) updateAllMatching(initialQuest.id, updates);
+      else updateQuest(initialQuest.id, updates);
+      if (onCancel) onCancel();
+      return;
+    }
 
     let config;
     if (recurrenceType === 'single') config = { type: recurrenceType, startDate: scheduledDate };
@@ -37,6 +49,11 @@ export default function QuestForm() {
 
     addQuest(quests);
     setOpen(false); setTitle('');
+  };
+
+  const handleCancel = () => {
+    if (onCancel) onCancel();
+    else setOpen(false);
   };
 
   if (!open) return <button className="new-quest-btn" onClick={() => setOpen(true)}>➕ Formatar Nova Missão</button>;
@@ -65,6 +82,13 @@ export default function QuestForm() {
         {TAGS.map(t => <button type="button" key={t} onClick={()=>setTag(t)} style={{padding:'6px 12px', background: tag === t ? '#4ade80':'rgba(255,255,255,0.05)', color:'#fff', border:'none', borderRadius:'20px', cursor:'pointer', fontSize:'0.85rem'}}>{t}</button>)}
       </div>
 
+      {initialQuest && initialQuest.recurrenceType && initialQuest.recurrenceType !== 'single' && (
+        <label className="recurrence-checkbox" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '10px 0', fontSize: '0.9rem', color: '#fff', cursor: 'pointer' }}>
+          <input type="checkbox" checked={applyToAll} onChange={e => setApplyToAll(e.target.checked)} />
+          Aplicar a todas as ocorrências pendentes
+        </label>
+      )}
+
       <div className="difficulty-selector">
         {(Object.keys(DIFFICULTY_CONFIG) as QuestDifficulty[]).map(d => {
           const cfg = DIFFICULTY_CONFIG[d];
@@ -73,8 +97,10 @@ export default function QuestForm() {
       </div>
       
       <div className="form-actions" style={{marginTop:'10px'}}>
-        <button type="submit" className="submit-btn" style={{background:'#e94560'}}>🏹 Declarar Missão</button>
-        <button type="button" className="cancel-btn" onClick={() => setOpen(false)}>Recuar</button>
+        <button type="submit" className="submit-btn" style={{background:'#e94560'}}>
+          {initialQuest ? '💾 Salvar Alterações' : '🏹 Declarar Missão'}
+        </button>
+        <button type="button" className="cancel-btn" onClick={handleCancel}>Recuar</button>
       </div>
     </form>
   );

@@ -331,6 +331,100 @@ body {
 
 .quest-card:hover { transform: translateX(4px); }
 
+.quest-card.editing {
+  padding: 8px;
+  background: rgba(15, 52, 96, 0.95);
+  border-style: dashed;
+}
+
+.quest-card.editing .quest-form {
+  background: transparent;
+  backdrop-filter: none;
+  border: none;
+  padding: 10px;
+  margin-bottom: 0;
+}
+
+.edit-btn {
+  background: transparent;
+  border: 1px solid rgba(250, 204, 21, 0.3);
+  color: #facc15;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+
+.edit-btn:hover {
+  background: rgba(250, 204, 21, 0.1);
+}
+
+.recurrence-checkbox:hover {
+  color: var(--gold);
+}
+
+/* Quick Edit Description */
+.quest-description-area {
+  margin-bottom: 12px;
+}
+
+.edit-desc-link {
+  background: transparent;
+  border: none;
+  color: var(--gold);
+  font-size: 0.75rem;
+  cursor: pointer;
+  opacity: 0.7;
+  padding: 0;
+  transition: opacity 0.2s;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.edit-desc-link:hover {
+  opacity: 1;
+}
+
+.quick-edit-desc textarea {
+  width: 100%;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 8px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  margin-bottom: 6px;
+  min-height: 60px;
+}
+
+.quick-edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.save-desc-btn {
+  background: var(--gold);
+  color: #000;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cancel-desc-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--text-dim);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
 .quest-card.completed {
   opacity: 0.55;
 }

@@ -19,6 +19,8 @@ interface AppState {
   addQuest: (q: Quest | Quest[]) => void;
   deleteQuest: (id: string) => void;
   deleteAllMatching: (id: string) => void;
+  updateQuest: (id: string, updates: Partial<Quest>) => void;
+  updateAllMatching: (id: string, updates: Partial<Quest>) => void;
   completeQuestAction: (id: string) => { leveledUp: boolean, isAllDayDone: boolean };
   clearLevelUpMsg: () => void;
   buyShopItem: (cost: number, itemName: string, isBg?: boolean) => boolean;
@@ -52,6 +54,29 @@ export const useStore = create<AppState>()(
                 (q.recurrenceType || 'single') === (target.recurrenceType || 'single') &&
                 (q.recurrenceType || 'single') !== 'single')
             )
+          };
+        });
+      },
+
+      updateQuest: (id, updates) => {
+        set((s) => ({
+          quests: s.quests.map(q => q.id === id ? { ...q, ...updates } : q)
+        }));
+      },
+
+      updateAllMatching: (id, updates) => {
+        set((s) => {
+          const target = s.quests.find(q => q.id === id);
+          if (!target) return s;
+          return {
+            quests: s.quests.map(q => {
+              const isMatch = q.title === target.title &&
+                q.difficulty === target.difficulty &&
+                (q.recurrenceType || 'single') === (target.recurrenceType || 'single') &&
+                (q.recurrenceType || 'single') !== 'single' &&
+                !q.completed; 
+              return isMatch ? { ...q, ...updates } : q;
+            })
           };
         });
       },
