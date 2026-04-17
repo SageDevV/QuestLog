@@ -10,10 +10,12 @@
     "preview": "vite preview",
     "test": "vitest --run",
     "build:launcher": "esbuild launcher.ts --bundle --platform=node --target=node18 --outfile=dist/launcher.js",
-    "build:exe": "npm run build:launcher && npx pkg . --output dist/QuestLog.exe --icon assets/quest-log.ico && node scripts/copy-to-desktop.js"
+    "build:exe": "npm run build:launcher && npx pkg . --output dist/QuestLog.exe --icon assets/quest-log.ico && node scripts/copy-to-desktop.js",
+    "deploy": "npm run build && npx firebase-tools deploy --only hosting"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",
+    "firebase": "^12.12.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "recharts": "^3.8.1",

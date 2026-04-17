@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Quest, DIFFICULTY_CONFIG } from '../types';
+import { useStore } from '../store';
 import QuestForm from './QuestForm';
 
 interface Props {

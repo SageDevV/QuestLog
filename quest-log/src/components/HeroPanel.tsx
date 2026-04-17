@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useStore } from '../store';
+import { useAuth } from '../AuthContext';
 
 export default function HeroPanel() {
   const { hero, setHeroName, resetHero } = useStore();
+  const { user, signOut } = useAuth();
   const [editing, setEditing] = useState(false);
   const [tempName, setTempName] = useState(hero.name);
 
@@ -12,6 +14,19 @@ export default function HeroPanel() {
 
   return (
     <div className="hero-panel">
+      {/* User info bar */}
+      {user && (
+        <div className="user-bar">
+          <div className="user-info">
+            {user.photoURL && <img src={user.photoURL} alt="" className="user-avatar" referrerPolicy="no-referrer" />}
+            <span className="user-email">{user.displayName || user.email}</span>
+          </div>
+          <button className="logout-btn" onClick={signOut} title="Sair da conta">
+            🚪 Sair
+          </button>
+        </div>
+      )}
+
       <div className="hero-header">
         {editing ? (
           <div className="hero-edit">

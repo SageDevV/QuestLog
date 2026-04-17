@@ -1,5 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useStore } from './store';
+import { useAuth } from './AuthContext';
+import { loadUserData, saveUserData } from './firestoreSync';
 import confetti from 'canvas-confetti';
 import HeroPanel from './components/HeroPanel';
 import QuestForm from './components/QuestForm';
@@ -10,10 +12,12 @@ import ButtonClickSound from './components/ButtonClickSound';
 import QuestCalendar from './components/QuestCalendar';
 import DashboardStats from './components/DashboardStats';
 import ShopTavern from './components/ShopTavern';
+import LoginScreen from './components/LoginScreen';
 import missionClearSrc from './music_mission_clear.mp3';
 import { bgSuspend, bgResume } from './bgAudio';
 
 export default function App() {
+  const { user, loading } = useAuth();
   const quests = useStore(s => s.quests);
   const hero = useStore(s => s.hero);
   const levelUpMsg = useStore(s => s.levelUpMsg);
@@ -21,6 +25,34 @@ export default function App() {
   
   const [filter, setFilter] = useState<'active' | 'completed' | 'calendar' | 'dashboard' | 'shop'>('active');
   const [recurrenceFilter, setRecurrenceFilter] = useState<'all' | 'single' | 'daily' | 'weekly'>('all');
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  // Auto-save debounce ref
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Load data from Firestore on login
+  useEffect(() => {
+    if (user && !dataLoaded) {
+      loadUserData(user.uid).then(() => setDataLoaded(true));
+    }
+    if (!user) {
+      setDataLoaded(false);
+    }
+  }, [user, dataLoaded]);
+
+  // Auto-save to Firestore on data changes (debounced)
+  useEffect(() => {
+    if (!user || !dataLoaded) return;
+
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => {
+      saveUserData(user.uid);
+    }, 2000);
+
+    return () => {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    };
+  }, [quests, hero, user, dataLoaded]);
 
   // Trigger confetti per quest automatically
   useEffect(() => {
@@ -71,6 +103,26 @@ export default function App() {
       tomorrowQuests: quests.filter(q => !q.completed && q.scheduledDate >= tomorrowTs && q.scheduledDate < dayAfterTs)
     };
   }, [quests]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="login-screen">
+        <div className="login-card" style={{ textAlign: 'center' }}>
+          <div className="login-logo">
+            <span className="login-logo-icon">⚔️</span>
+            <h1 className="login-title">QuestLog</h1>
+            <p className="login-subtitle">Carregando...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Not logged in
+  if (!user) {
+    return <LoginScreen />;
+  }
 
   return (
     <>

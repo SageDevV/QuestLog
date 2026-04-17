@@ -76,3 +76,21 @@ AttributeError: type object 'Menu' has no attribute 'Separator'
     ^^^^^^^^^^^^^^^^^^^^^^
 AttributeError: type object 'Menu' has no attribute 'Separator'
 
+[Fri Apr 17 09:04:43 2026] Erro no Tray Icon: Traceback (most recent call last):
+  File "C:\Users\usuario\Documents\QuestLog\quest-log\iniciar_app.py", line 103, in main
+    pystray.Menu.Separator(),
+    ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'Menu' has no attribute 'Separator'
+
+[Fri Apr 17 14:07:20 2026] Erro no Tray Icon: Traceback (most recent call last):
+  File "C:\Users\usuario\Documents\QuestLog\quest-log\iniciar_app.py", line 103, in main
+    pystray.Menu.Separator(),
+    ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'Menu' has no attribute 'Separator'
+
+[Fri Apr 17 14:19:09 2026] Erro no Tray Icon: Traceback (most recent call last):
+  File "C:\Users\usuario\Documents\QuestLog\quest-log\iniciar_app.py", line 103, in main
+    pystray.Menu.Separator(),
+    ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'Menu' has no attribute 'Separator'
+
