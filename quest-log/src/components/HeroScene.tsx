@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import runnerGif from '../runner.gif';
-import runnerzGif from '../runnerz.gif';
+
 
 function getTimeOfDay(): 'morning' | 'afternoon' | 'night' {
   const h = new Date().getHours();
@@ -66,9 +66,7 @@ export default function HeroScene() {
         <img src={runnerGif} alt="" className="scene-hero-sprite" />
       </div>
 
-      <div className="scene-hero-container scene-hero-right">
-        <img src={runnerzGif} alt="" className="scene-hero-sprite" />
-      </div>
+
 
       <div className={`scene-particles scene-particles--${timeOfDay}`} style={{opacity: isRaining ? 0.2 : 1}}>
         {[...Array(12)].map((_, i) => <span key={i} className={`particle p${i+1}`} />)}

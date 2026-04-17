@@ -18,7 +18,7 @@ export default function LoginScreen() {
       <div className="login-card">
         <div className="login-logo">
           <span className="login-logo-icon">⚔️</span>
-          <h1 className="login-title">QuestLog</h1>
+          <h1 className="login-title">MissionLog</h1>
           <p className="login-subtitle">Gerencie suas missões como um verdadeiro herói</p>
         </div>
 

@@ -111,7 +111,7 @@ export default function App() {
         <div className="login-card" style={{ textAlign: 'center' }}>
           <div className="login-logo">
             <span className="login-logo-icon">⚔️</span>
-            <h1 className="login-title">QuestLog</h1>
+            <h1 className="login-title">MissionLog</h1>
             <p className="login-subtitle">Carregando...</p>
           </div>
         </div>
@@ -135,7 +135,7 @@ export default function App() {
       {(hero.bgUnlocked.includes('Estilo: Matrix Hacker (Verde)')) && <div style={{position:'fixed', inset:0, background:'rgba(0, 200, 50, 0.15)', pointerEvents:'none', zIndex:1}} />}
 
       <div className="app" style={{ zIndex:10 }}>
-        <h1 className="app-title">QuestLog</h1>
+        <h1 className="app-title">MissionLog</h1>
 
         {levelUpMsg && <div className="level-up-toast">{levelUpMsg}</div>}
 
