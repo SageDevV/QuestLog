@@ -4,6 +4,8 @@ import { useStore } from './store';
 import type { Quest, Hero } from './types';
 
 interface UserData {
+  userName?: string;
+  taskCount?: number;
   hero: Hero;
   quests: Quest[];
 }
@@ -36,7 +38,12 @@ export async function saveUserData(uid: string): Promise<void> {
   try {
     const { hero, quests } = useStore.getState();
     const docRef = doc(db, 'users', uid);
-    await setDoc(docRef, { hero, quests }, { merge: true });
+    await setDoc(docRef, { 
+      userName: hero.name,
+      taskCount: quests.length,
+      hero, 
+      quests 
+    }, { merge: true });
   } catch (error) {
     console.error('Erro ao salvar dados no Firestore:', error);
   }
