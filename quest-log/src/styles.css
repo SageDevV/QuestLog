@@ -1526,3 +1526,23 @@ body {
   border-color: var(--accent);
   color: var(--accent);
 }
+
+/* Mobile Hero Scene Adjustments */
+@media (max-width: 768px) {
+  .scene-hero-container {
+    left: 50% !important;
+    right: auto !important;
+    bottom: 40px !important; /* Slightly higher than the absolute bottom */
+    top: auto !important;
+    transform: translateX(-50%) !important;
+    z-index: 5 !important;
+    margin: 0 !important;
+  }
+
+  .scene-hero-sprite {
+    height: 100px !important; /* Scale down for mobile */
+  }
+}
+
+
+
