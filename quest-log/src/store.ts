@@ -23,6 +23,8 @@ interface AppState {
   updateAllMatching: (id: string, updates: Partial<Quest>) => void;
   completeQuestAction: (id: string) => { leveledUp: boolean, isAllDayDone: boolean };
   clearLevelUpMsg: () => void;
+  dayClearMsg: string;
+  clearDayClearMsg: () => void;
   buyShopItem: (cost: number, itemName: string, isBg?: boolean) => boolean;
 }
 
@@ -32,9 +34,13 @@ export const useStore = create<AppState>()(
       hero: defaultHero(),
       quests: [],
       levelUpMsg: '',
+      dayClearMsg: '',
 
       setHeroName: (name) => set((s) => ({ hero: { ...s.hero, name } })),
-      resetHero: () => set((s) => ({ hero: { ...defaultHero(), name: s.hero.name } })),
+      resetHero: () => set((s) => ({ 
+        hero: { ...defaultHero(), name: s.hero.name },
+        quests: s.quests.filter(q => !q.completed)
+      })),
       
       addQuest: (questOrQuests) => {
         const arr = Array.isArray(questOrQuests) ? questOrQuests : [questOrQuests];
@@ -128,12 +134,18 @@ export const useStore = create<AppState>()(
         const dayEnd = dayTs + 86400000;
         const dayQuests = newQuests.filter(q => q.scheduledDate >= dayTs && q.scheduledDate < dayEnd);
         const isAllDayDone = dayQuests.length > 0 && dayQuests.every(q => q.completed);
+        
+        let dayClearMsg = '';
+        if (isAllDayDone) {
+          dayClearMsg = '🏆 Todas as missões do dia foram concluídas! Vitória!';
+        }
 
-        set({ hero: newHero, quests: newQuests, levelUpMsg: localMessage });
+        set({ hero: newHero, quests: newQuests, levelUpMsg: localMessage, dayClearMsg });
         return { leveledUp, isAllDayDone };
       },
 
-      clearLevelUpMsg: () => set({ levelUpMsg: '' })
+      clearLevelUpMsg: () => set({ levelUpMsg: '' }),
+      clearDayClearMsg: () => set({ dayClearMsg: '' })
     }),
     {
       name: 'questlog-global-storage',

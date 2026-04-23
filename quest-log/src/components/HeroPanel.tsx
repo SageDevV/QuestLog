@@ -49,7 +49,7 @@ export default function HeroPanel() {
       <div className="hero-stats">
         <span>⚡ {hero.gold} Gold</span>
         <span>✅ {hero.questsCompleted} Missões</span>
-        <button className="reset-btn" onClick={() => { if (confirm('Zerar seu progresso e golds?')) resetHero(); }}>Resetar Vida</button>
+        <button className="reset-btn" onClick={() => { if (confirm('Zerar seu progresso e golds? (Missões concluídas serão apagadas, pendentes serão mantidas)')) resetHero(); }}>Resetar Vida</button>
       </div>
     </div>
   );

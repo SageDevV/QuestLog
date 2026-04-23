@@ -22,6 +22,8 @@ export default function App() {
   const hero = useStore(s => s.hero);
   const levelUpMsg = useStore(s => s.levelUpMsg);
   const clearLevelUpMsg = useStore(s => s.clearLevelUpMsg);
+  const dayClearMsg = useStore(s => s.dayClearMsg);
+  const clearDayClearMsg = useStore(s => s.clearDayClearMsg);
   
   const [filter, setFilter] = useState<'active' | 'completed' | 'calendar' | 'dashboard' | 'shop'>('active');
   const [recurrenceFilter, setRecurrenceFilter] = useState<'all' | 'single' | 'daily' | 'weekly'>('all');
@@ -83,6 +85,30 @@ export default function App() {
     }
   }, [levelUpMsg, clearLevelUpMsg]);
 
+  // Trigger Victory Fanfare for Day Clear
+  useEffect(() => {
+    if (dayClearMsg && !levelUpMsg) { // Avoid double trigger if both happen
+      bgSuspend();
+      const audio = new Audio(missionClearSrc);
+      audio.volume = 0.5;
+      audio.play().catch(() => {});
+      audio.onended = () => { bgResume(); }
+
+      let burstCount = 0;
+      const interval = setInterval(() => {
+        confetti({ particleCount: 40, angle: 90, spread: 70, origin: { x: 0.5, y: 0.7 }, colors: ['#4ade80', '#facc15'], zIndex: 10000 });
+        burstCount++;
+        if (burstCount >= 3) clearInterval(interval);
+      }, 600);
+
+      setTimeout(clearDayClearMsg, 4000);
+      return () => clearInterval(interval);
+    } else if (dayClearMsg && levelUpMsg) {
+      // If both happen, clear level up will handle the music, just clear day message after some time
+      setTimeout(clearDayClearMsg, 4000);
+    }
+  }, [dayClearMsg, levelUpMsg, clearDayClearMsg]);
+
   // Filter derivations - Optimized with useMemo
   const filtered = useMemo(() => {
     return quests.filter(q => filter === 'active' ? !q.completed : q.completed)
@@ -138,6 +164,7 @@ export default function App() {
         <h1 className="app-title">MissionLog</h1>
 
         {levelUpMsg && <div className="level-up-toast">{levelUpMsg}</div>}
+        {dayClearMsg && <div className="level-up-toast day-clear">{dayClearMsg}</div>}
 
         <HeroPanel />
         {filter !== 'shop' && filter !== 'dashboard' && <QuestForm />}

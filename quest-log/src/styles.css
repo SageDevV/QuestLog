@@ -48,6 +48,13 @@ body {
   animation: toast-in 0.4s ease;
 }
 
+.level-up-toast.day-clear {
+  background: linear-gradient(135deg, #064e3b, #1a1a4e);
+  border-color: #4ade80;
+  color: #4ade80;
+  box-shadow: 0 0 15px rgba(74, 222, 128, 0.2);
+}
+
 @keyframes toast-in {
   from { opacity: 0; transform: translateY(-20px) scale(0.95); }
   to { opacity: 1; transform: translateY(0) scale(1); }
