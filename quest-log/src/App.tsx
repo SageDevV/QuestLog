@@ -13,6 +13,7 @@ import QuestCalendar from './components/QuestCalendar';
 import DashboardStats from './components/DashboardStats';
 import ShopTavern from './components/ShopTavern';
 import LoginScreen from './components/LoginScreen';
+import WarningScreen from './components/WarningScreen';
 import missionClearSrc from './music_mission_clear.mp3';
 import { bgSuspend, bgResume } from './bgAudio';
 
@@ -28,6 +29,9 @@ export default function App() {
   const [filter, setFilter] = useState<'active' | 'completed' | 'calendar' | 'dashboard' | 'shop'>('active');
   const [recurrenceFilter, setRecurrenceFilter] = useState<'all' | 'single' | 'daily' | 'weekly'>('all');
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
+  const [highlightHardQuests, setHighlightHardQuests] = useState(false);
+  const hasSeenWarningRef = useRef(false);
 
   // Auto-save debounce ref
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -39,6 +43,28 @@ export default function App() {
     }
     if (!user) {
       setDataLoaded(false);
+      hasSeenWarningRef.current = false;
+    }
+  }, [user, dataLoaded]);
+
+  // Mega Man X Warning Screen Logic
+  useEffect(() => {
+    if (user && dataLoaded && !hasSeenWarningRef.current) {
+      hasSeenWarningRef.current = true;
+      const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+      const tomorrowTs = todayStart.getTime() + 86400000;
+      
+      const currentQuests = useStore.getState().quests;
+      const hasHardQuestsToday = currentQuests.some(q => 
+        !q.completed && 
+        q.scheduledDate >= todayStart.getTime() && 
+        q.scheduledDate < tomorrowTs && 
+        (q.difficulty === 'hard' || q.difficulty === 'legendary')
+      );
+
+      if (hasHardQuestsToday) {
+        setShowWarning(true);
+      }
     }
   }, [user, dataLoaded]);
 
@@ -156,6 +182,12 @@ export default function App() {
       <BgMusic />
       <ButtonClickSound />
       
+      {showWarning && <WarningScreen onClose={() => {
+        setShowWarning(false);
+        setHighlightHardQuests(true);
+        setTimeout(() => setHighlightHardQuests(false), 3000);
+      }} />}
+      
       {/* Background unlock logic check */}
       {(hero.bgUnlocked.includes('Estilo: Crimson Ninja (Vermelho)')) && <div style={{position:'fixed', inset:0, background:'rgba(200, 0, 0, 0.15)', pointerEvents:'none', zIndex:1}} />}
       {(hero.bgUnlocked.includes('Estilo: Matrix Hacker (Verde)')) && <div style={{position:'fixed', inset:0, background:'rgba(0, 200, 50, 0.15)', pointerEvents:'none', zIndex:1}} />}
@@ -196,7 +228,7 @@ export default function App() {
             {todayQuests.length > 0 && (
               <div className="day-section">
                 <h2 className="day-section-title">📌 Hoje</h2>
-                <QuestList quests={todayQuests} />
+                <QuestList quests={todayQuests} highlightHard={highlightHardQuests} />
               </div>
             )}
             {tomorrowQuests.length > 0 && (

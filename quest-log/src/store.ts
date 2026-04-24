@@ -133,8 +133,14 @@ export const useStore = create<AppState>()(
         todayStart.setHours(0, 0, 0, 0);
         const todayTs = todayStart.getTime();
         const todayEnd = todayTs + 86400000;
-        const todayQuests = newQuests.filter(q => q.scheduledDate >= todayTs && q.scheduledDate < todayEnd);
-        const isAllDayDone = todayQuests.length > 0 && todayQuests.every(q => q.completed);
+        
+        const isQuestForToday = quest.scheduledDate >= todayTs && quest.scheduledDate < todayEnd;
+        
+        let isAllDayDone = false;
+        if (isQuestForToday) {
+          const todayQuests = newQuests.filter(q => q.scheduledDate >= todayTs && q.scheduledDate < todayEnd);
+          isAllDayDone = todayQuests.length > 0 && todayQuests.every(q => q.completed);
+        }
         
         let dayClearMsg = '';
         if (isAllDayDone) {

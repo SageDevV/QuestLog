@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { Quest, DIFFICULTY_CONFIG } from '../types';
 import { useStore } from '../store';
 
-interface Props { quests: Quest[]; }
+interface Props { quests: Quest[]; highlightHard?: boolean; }
 
-export default function QuestList({ quests }: Props) {
+export default function QuestList({ quests, highlightHard }: Props) {
   const completeQuestAction = useStore(s => s.completeQuestAction);
   const deleteQuest = useStore(s => s.deleteQuest);
   const deleteAllMatching = useStore(s => s.deleteAllMatching);
@@ -36,9 +36,10 @@ export default function QuestList({ quests }: Props) {
         const cfg = DIFFICULTY_CONFIG[quest.difficulty];
         const isRecurrent = quest.recurrenceType && quest.recurrenceType !== 'single';
         const isEditing = editingId === quest.id;
+        const shouldHighlight = highlightHard && !quest.completed && (quest.difficulty === 'hard' || quest.difficulty === 'legendary');
 
         return (
-          <div key={quest.id} className={`quest-card ${quest.completed ? 'completed' : ''}`} style={{ borderLeftColor: cfg.color }}>
+          <div key={quest.id} className={`quest-card ${quest.completed ? 'completed' : ''} ${shouldHighlight ? 'highlight-danger' : ''}`} style={{ borderLeftColor: cfg.color }}>
             <div className="quest-card-header">
               <span className="quest-difficulty" style={{ color: cfg.color }}>
                 {cfg.emoji} {cfg.label} {quest.tag && <span style={{marginLeft:'6px', background:'rgba(255,255,255,0.1)', padding:'2px 8px', borderRadius:'10px', fontSize:'0.75rem', color:'#fff'}}>{quest.tag}</span>}
