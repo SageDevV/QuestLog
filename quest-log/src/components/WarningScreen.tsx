@@ -2,13 +2,18 @@ import { useEffect, useState } from 'react';
 import warningSrc from '../warning.mp3';
 import { bgSuspend, bgResume } from '../bgAudio';
 
+// Preload the audio globally as soon as the module loads
+const preloadedWarningAudio = new Audio(warningSrc);
+preloadedWarningAudio.preload = 'auto';
+
 export default function WarningScreen({ onClose }: { onClose: () => void }) {
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
     bgSuspend();
-    const audio = new Audio(warningSrc);
+    const audio = preloadedWarningAudio;
     audio.volume = 0.5;
+    audio.currentTime = 0; // Reset in case it was played before
     
     // Play the audio and when it finishes, trigger the close animation
     audio.play().catch(() => {

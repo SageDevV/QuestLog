@@ -345,7 +345,7 @@ body {
 }
 
 .quest-card.highlight-danger {
-  animation: danger-pulse-extreme 0.3s infinite alternate;
+  animation: danger-pulse-extreme 0.25s infinite alternate;
   border: 3px solid #ff0000 !important;
   position: relative;
   z-index: 10;
@@ -1670,7 +1670,7 @@ body {
     4px 4px 0px #880000;
   letter-spacing: 1vw;
   margin: 0;
-  animation: warning-text-pulse 0.6s infinite alternate;
+  animation: warning-text-pulse 0.5s infinite alternate;
   transform: scale(1);
 }
 
