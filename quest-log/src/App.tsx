@@ -32,9 +32,6 @@ export default function App() {
   // Auto-save debounce ref
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Ref to track if cleanup has run
-  const cleanupDoneRef = useRef(false);
-
   // Load data from Firestore on login
   useEffect(() => {
     if (user && !dataLoaded) {
@@ -42,22 +39,6 @@ export default function App() {
     }
     if (!user) {
       setDataLoaded(false);
-      cleanupDoneRef.current = false;
-    }
-  }, [user, dataLoaded]);
-
-  // One-time cleanup: delete quests with scheduledDate before 2026-04-24
-  useEffect(() => {
-    if (!user || !dataLoaded || cleanupDoneRef.current) return;
-    cleanupDoneRef.current = true;
-    const cutoff = new Date('2026-04-24T00:00:00').getTime();
-    const currentQuests = useStore.getState().quests;
-    const cleaned = currentQuests.filter(q => q.scheduledDate >= cutoff);
-    if (cleaned.length < currentQuests.length) {
-      console.log(`[Cleanup] Removed ${currentQuests.length - cleaned.length} old quests (before 2026-04-24)`);
-      useStore.setState({ quests: cleaned });
-      // Force save after cleanup
-      setTimeout(() => saveUserData(user.uid), 500);
     }
   }, [user, dataLoaded]);
 
