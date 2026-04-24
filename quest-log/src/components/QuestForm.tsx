@@ -37,7 +37,12 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
 
     let config;
     if (recurrenceType === 'single') config = { type: recurrenceType, startDate: scheduledDate };
-    else config = { type: recurrenceType, startDate: `${new Date().getFullYear()}-01-01`, endDate: `${new Date().getFullYear()}-12-31`, weekdays: recurrenceType === 'weekly' ? selectedWeekdays : undefined };
+    else {
+      // Generate from today through end of year
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      config = { type: recurrenceType, startDate: todayStr, endDate: `${today.getFullYear()}-12-31`, weekdays: recurrenceType === 'weekly' ? selectedWeekdays : undefined };
+    }
 
     const error = validateRecurrenceConfig(config);
     if (error) { setFormError(error); return; }

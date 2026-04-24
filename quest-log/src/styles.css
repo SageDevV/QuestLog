@@ -634,45 +634,62 @@ body {
   100% { opacity: 1; }
 }
 
-/* Mountains (far background) — futuristic city skyline */
-.scene-mountains {
+/* ── Cyberpunk City SVG base ────────────────────────────────── */
+.cyberpunk-city-svg {
+  display: inline-block;
+  width: 50%;
+  height: 100%;
+  vertical-align: bottom;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ── Horizon city layer (blurred silhouettes, very far) ─────── */
+.scene-city-horizon {
+  position: absolute;
+  bottom: 100px;
+  left: 0;
+  width: 200%;
+  height: 100px;
+  white-space: nowrap;
+  font-size: 0;
+  line-height: 0;
+  opacity: 0.3;
+  z-index: 0;
+  filter: blur(2px);
+  animation: scroll-slow 120s linear infinite;
+  transition: filter 1s ease, opacity 1s ease;
+}
+
+/* ── Far city layer (background, moderate) ──────────────────── */
+.scene-city-far {
   position: absolute;
   bottom: 70px;
   left: 0;
   width: 200%;
-  height: 80px;
-  animation: scroll-slow 40s linear infinite;
+  height: 180px;
+  white-space: nowrap;
+  font-size: 0;
+  line-height: 0;
+  opacity: 0.5;
+  z-index: 1;
+  animation: scroll-slow 80s linear infinite;
+  transition: filter 1s ease;
 }
 
-.scene-mountains::before,
-.scene-mountains::after {
-  content: '';
+/* ── Near city layer (foreground, tallest, fastest) ─────────── */
+.scene-city-near {
   position: absolute;
-  bottom: 0;
-  width: 50%;
-  height: 100%;
-}
-
-.scene-mountains::before {
+  bottom: 40px;
   left: 0;
-  background:
-    conic-gradient(from 180deg at 10% 100%, #1a237e 0deg, transparent 15deg),
-    conic-gradient(from 180deg at 25% 100%, #283593 0deg, transparent 10deg),
-    conic-gradient(from 180deg at 40% 100%, #1a237e 0deg, transparent 18deg),
-    conic-gradient(from 180deg at 55% 100%, #311b92 0deg, transparent 12deg),
-    conic-gradient(from 180deg at 70% 100%, #283593 0deg, transparent 15deg),
-    conic-gradient(from 180deg at 85% 100%, #1a237e 0deg, transparent 10deg);
-}
-
-.scene-mountains::after {
-  left: 50%;
-  background:
-    conic-gradient(from 180deg at 10% 100%, #1a237e 0deg, transparent 15deg),
-    conic-gradient(from 180deg at 25% 100%, #283593 0deg, transparent 10deg),
-    conic-gradient(from 180deg at 40% 100%, #1a237e 0deg, transparent 18deg),
-    conic-gradient(from 180deg at 55% 100%, #311b92 0deg, transparent 12deg),
-    conic-gradient(from 180deg at 70% 100%, #283593 0deg, transparent 15deg),
-    conic-gradient(from 180deg at 85% 100%, #1a237e 0deg, transparent 10deg);
+  width: 200%;
+  height: 300px;
+  white-space: nowrap;
+  font-size: 0;
+  line-height: 0;
+  z-index: 2;
+  animation: scroll-medium 50s linear infinite;
+  transition: filter 1s ease;
 }
 
 /* Grass (mid ground) — futuristic road surface */
@@ -683,6 +700,7 @@ body {
   width: 200%;
   height: 70px;
   animation: scroll-medium 20s linear infinite;
+  z-index: 3;
 }
 
 .scene-grass::before,
@@ -697,6 +715,49 @@ body {
 
 .scene-grass::before { left: 0; }
 .scene-grass::after { left: 50%; }
+
+/* ── Neon ground reflection (CSS-only glow on the road) ────── */
+.hero-scene-bg::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: screen;
+  transition: background 2s ease;
+}
+
+.hero-scene-bg .scene-sky--morning ~ .scene-grass,
+.scene-sky--morning ~ * .scene-grass { /* morning roads stay default */ }
+
+/* ── Atmospheric haze between layers ───────────────────────── */
+.scene-city-near::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  background: linear-gradient(180deg, transparent 0%, rgba(10, 15, 30, 0.6) 100%);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.scene-city-far::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(10, 15, 30, 0.3) 0%, transparent 40%, transparent 80%, rgba(10, 15, 30, 0.2) 100%);
+  z-index: 10;
+  pointer-events: none;
+}
 
 /* Grass detail (front) — neon road lines */
 .scene-grass-front {

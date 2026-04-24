@@ -128,12 +128,13 @@ export const useStore = create<AppState>()(
         
         let localMessage = leveledUp ? `⚡ Level Up! Você alcançou o nível ${newHero.level}! Novo título: ${newHero.title}` : '';
 
-        const dayStart = new Date(quest.scheduledDate);
-        dayStart.setHours(0, 0, 0, 0);
-        const dayTs = dayStart.getTime();
-        const dayEnd = dayTs + 86400000;
-        const dayQuests = newQuests.filter(q => q.scheduledDate >= dayTs && q.scheduledDate < dayEnd);
-        const isAllDayDone = dayQuests.length > 0 && dayQuests.every(q => q.completed);
+        // Check if ALL quests for TODAY (current date) are done
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const todayTs = todayStart.getTime();
+        const todayEnd = todayTs + 86400000;
+        const todayQuests = newQuests.filter(q => q.scheduledDate >= todayTs && q.scheduledDate < todayEnd);
+        const isAllDayDone = todayQuests.length > 0 && todayQuests.every(q => q.completed);
         
         let dayClearMsg = '';
         if (isAllDayDone) {

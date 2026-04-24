@@ -1,8 +1,14 @@
 import { useState, useEffect } from 'react';
 import runnerGif from '../runner.gif';
+import CyberpunkCity from './CyberpunkCity';
 
 
 function getTimeOfDay(): 'morning' | 'afternoon' | 'night' {
+  // Allow URL override for testing: ?time=morning|afternoon|night
+  const params = new URLSearchParams(window.location.search);
+  const override = params.get('time');
+  if (override === 'morning' || override === 'afternoon' || override === 'night') return override;
+
   const h = new Date().getHours();
   if (h >= 6 && h < 12) return 'morning';
   if (h >= 12 && h < 18) return 'afternoon';
@@ -56,7 +62,24 @@ export default function HeroScene() {
         <div className="scene-rain-overlay" style={{position:'absolute', inset:0, background:'rgba(5, 10, 20, 0.5)', zIndex:2}} />
       )}
 
-      <div className="scene-mountains" style={{filter: isRaining ? 'brightness(0.6)' : 'none'}}/>
+      {/* ── Cyberpunk city — horizon (blurred silhouettes) ── */}
+      <div className="scene-city-horizon" style={{filter: isRaining ? 'brightness(0.4)' : 'none'}}>
+        <CyberpunkCity timeOfDay={timeOfDay} layer="horizon" />
+        <CyberpunkCity timeOfDay={timeOfDay} layer="horizon" />
+      </div>
+
+      {/* ── Cyberpunk city skyline (far) ── */}
+      <div className="scene-city-far" style={{filter: isRaining ? 'brightness(0.5)' : 'none'}}>
+        <CyberpunkCity timeOfDay={timeOfDay} layer="far" />
+        <CyberpunkCity timeOfDay={timeOfDay} layer="far" />
+      </div>
+
+      {/* ── Cyberpunk city skyline (near / bigger) ── */}
+      <div className="scene-city-near" style={{filter: isRaining ? 'brightness(0.6)' : 'none'}}>
+        <CyberpunkCity timeOfDay={timeOfDay} layer="near" />
+        <CyberpunkCity timeOfDay={timeOfDay} layer="near" />
+      </div>
+
       <div className="scene-grass" style={{filter: isRaining ? 'brightness(0.8)' : 'none'}}/>
       <div className="scene-grass-front" />
 
