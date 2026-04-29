@@ -6,6 +6,14 @@ import { bgSuspend, bgResume } from '../bgAudio';
 const preloadedWarningAudio = new Audio(warningSrc);
 preloadedWarningAudio.preload = 'auto';
 
+// Call this during a user interaction (like login click) to unlock audio playback
+export const unlockWarningAudio = () => {
+  preloadedWarningAudio.play().then(() => {
+    preloadedWarningAudio.pause();
+    preloadedWarningAudio.currentTime = 0;
+  }).catch(() => {});
+};
+
 export default function WarningScreen({ onClose }: { onClose: () => void }) {
   const [isClosing, setIsClosing] = useState(false);
 

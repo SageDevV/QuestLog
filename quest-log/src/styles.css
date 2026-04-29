@@ -1298,6 +1298,18 @@ body {
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
+.day-section-title.pending {
+  color: #ff4444;
+  text-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+  animation: pending-pulse 2s infinite ease-in-out;
+}
+
+@keyframes pending-pulse {
+  0% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.01); }
+  100% { opacity: 0.8; transform: scale(1); }
+}
+
 /* ===== Afternoon Clouds ===== */
 .scene-clouds {
   position: absolute;

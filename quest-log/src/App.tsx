@@ -82,10 +82,23 @@ export default function App() {
     };
   }, [quests, hero, user, dataLoaded]);
 
+  const prevQuestsCompleted = useRef(hero.questsCompleted);
+  const isInitialMount = useRef(true);
+
   // Trigger confetti per quest automatically
   useEffect(() => {
-    if (hero.questsCompleted > 0) confetti({ particleCount: 80, spread: 60, origin: { y: 0.8 }, zIndex: 10000 });
-  }, [hero.questsCompleted]);
+    if (!dataLoaded) return;
+
+    if (!isInitialMount.current && hero.questsCompleted > prevQuestsCompleted.current) {
+      confetti({ particleCount: 80, spread: 60, origin: { y: 0.8 }, zIndex: 10000 });
+    }
+    
+    if (isInitialMount.current && dataLoaded) {
+      isInitialMount.current = false;
+    }
+    
+    prevQuestsCompleted.current = hero.questsCompleted;
+  }, [hero.questsCompleted, dataLoaded]);
 
   // Trigger mega Level Up Fanfare
   useEffect(() => {
@@ -144,13 +157,14 @@ export default function App() {
       });
   }, [quests, filter, recurrenceFilter]);
 
-  const { todayQuests, tomorrowQuests } = useMemo(() => {
+  const { pendingQuests, todayQuests, tomorrowQuests } = useMemo(() => {
     const todayStart = new Date(); todayStart.setHours(0,0,0,0);
     const todayTs = todayStart.getTime();
     const tomorrowTs = todayTs + 86400000;
     const dayAfterTs = tomorrowTs + 86400000;
 
     return {
+      pendingQuests: quests.filter(q => !q.completed && q.scheduledDate < todayTs),
       todayQuests: quests.filter(q => !q.completed && q.scheduledDate >= todayTs && q.scheduledDate < tomorrowTs),
       tomorrowQuests: quests.filter(q => !q.completed && q.scheduledDate >= tomorrowTs && q.scheduledDate < dayAfterTs)
     };
@@ -225,6 +239,12 @@ export default function App() {
 
         {filter === 'active' && (
           <>
+            {pendingQuests.length > 0 && (
+              <div className="day-section">
+                <h2 className="day-section-title pending">⚠️ Pendentes</h2>
+                <QuestList quests={pendingQuests} highlightHard={highlightHardQuests} />
+              </div>
+            )}
             {todayQuests.length > 0 && (
               <div className="day-section">
                 <h2 className="day-section-title">📌 Hoje</h2>
@@ -248,7 +268,7 @@ export default function App() {
                 </button>
               ))}
             </div>
-            {todayQuests.length === 0 && tomorrowQuests.length === 0 && filtered.length > 0 && <QuestList quests={filtered} />}
+            {pendingQuests.length === 0 && todayQuests.length === 0 && tomorrowQuests.length === 0 && filtered.length > 0 && <QuestList quests={filtered} />}
           </>
         )}
         
