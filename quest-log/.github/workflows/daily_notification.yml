@@ -2,7 +2,8 @@ name: Daily WhatsApp Notification
 
 on:
   schedule:
-    - cron: '0 21 * * *' # 18:00 BRT (UTC-3)
+    - cron: '5 10 * * *' # 07:05 BRT
+    - cron: '0 23 * * *' # 20:00 BRT
   workflow_dispatch: # Allow manual trigger
 
 jobs:
@@ -38,4 +39,14 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           CALLMEBOT_API_KEY: ${{ secrets.CALLMEBOT_API_KEY }}
           RECIPIENT_PHONE_NUMBER: ${{ secrets.RECIPIENT_PHONE_NUMBER }}
-        run: node scripts/whatsapp_notifications.mjs
+        run: |
+          if [ "${{ github.event.schedule }}" == "5 10 * * *" ]; then
+            echo "Running MORNING notification (07:05 BRT)"
+            node scripts/whatsapp_notifications.mjs --morning
+          elif [ "${{ github.event.schedule }}" == "0 23 * * *" ]; then
+            echo "Running EVENING notification (20:00 BRT)"
+            node scripts/whatsapp_notifications.mjs --evening
+          else
+            echo "Manual trigger or other event: running evening notification by default"
+            node scripts/whatsapp_notifications.mjs --evening
+          fi

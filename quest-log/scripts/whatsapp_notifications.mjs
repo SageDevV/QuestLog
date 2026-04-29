@@ -25,6 +25,11 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   process.exit(1);
 }
 
+// Parse command line arguments
+const args = process.argv.slice(2);
+const isMorning = args.includes('--morning');
+const isEvening = args.includes('--evening') || (!isMorning); // Default to evening if none specified
+
 const db = admin.firestore();
 
 const CALLMEBOT_API_KEY = process.env.CALLMEBOT_API_KEY;
@@ -51,47 +56,67 @@ async function sendWhatsApp(text) {
   }
 }
 
-async function notifyIncompleteQuests() {
-  console.log('--- Starting Notification Script ---');
+async function notifyQuests() {
+  const mode = isMorning ? 'MANHÃ' : 'NOITE';
+  console.log(`--- Starting Notification Script [Mode: ${mode}] ---`);
   
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const start = today.getTime();
   const end = start + 86400000;
   
-  console.log(`Checking quests for date: ${today.toLocaleDateString('pt-BR')}`);
+  const dateStr = today.toLocaleDateString('pt-BR');
+  console.log(`Checking quests for date: ${dateStr}`);
 
   try {
-    const usersCol = db.collection('users');
-    const snapshot = await usersCol.get();
+    const snapshot = await db.collection('users').get();
 
     for (const userDoc of snapshot.docs) {
       const data = userDoc.data();
       const heroName = data.hero?.name || 'Heroi';
       const quests = data.quests || [];
       
-      const incompleteToday = quests.filter(q => 
-        !q.completed && 
+      const questsToday = quests.filter(q => 
         q.scheduledDate >= start && 
         q.scheduledDate < end
       );
 
-      if (incompleteToday.length > 0) {
-        console.log(`User ${userDoc.id} (${heroName}): ${incompleteToday.length} incomplete quests found.`);
-        
-        let message = `⚔️ *MissionLog: Pendências de Hoje* (${today.toLocaleDateString('pt-BR')})\n\n`;
-        message += `Olá, ${heroName}! Você ainda tem as seguintes missões pendentes:\n\n`;
-        
-        incompleteToday.forEach((q, index) => {
-          const difficultyEmoji = q.difficulty === 'legendary' ? '🟣' : q.difficulty === 'hard' ? '🔴' : q.difficulty === 'medium' ? '🟡' : '🟢';
-          message += `${index + 1}. ${difficultyEmoji} *${q.title}*\n`;
-        });
-        
-        message += `\n👉 Acesse para completar: https://questlog-app-a5e29.web.app/`;
-        
-        await sendWhatsApp(message);
+      if (isMorning) {
+        if (questsToday.length > 0) {
+          console.log(`User ${userDoc.id} (${heroName}): Sending morning list with ${questsToday.length} quests.`);
+          
+          let message = `☀️ *MissionLog: Missões de Hoje* (${dateStr})\n\n`;
+          message += `Olá, ${heroName}! Aqui estão suas missões para hoje:\n\n`;
+          
+          questsToday.forEach((q, index) => {
+            const status = q.completed ? '✅' : (q.difficulty === 'legendary' ? '🟣' : q.difficulty === 'hard' ? '🔴' : q.difficulty === 'medium' ? '🟡' : '🟢');
+            message += `${index + 1}. ${status} *${q.title}*\n`;
+          });
+          
+          message += `\n👉 Boa sorte! https://questlog-app-a5e29.web.app/`;
+          await sendWhatsApp(message);
+        } else {
+          console.log(`User ${userDoc.id} (${heroName}): No quests scheduled for today.`);
+        }
       } else {
-        console.log(`User ${userDoc.id} (${heroName}): No incomplete quests for today.`);
+        const incompleteToday = questsToday.filter(q => !q.completed);
+        
+        if (incompleteToday.length > 0) {
+          console.log(`User ${userDoc.id} (${heroName}): ${incompleteToday.length} incomplete quests found.`);
+          
+          let message = `⚠️ *MissionLog: Pendências de Hoje* (${dateStr})\n\n`;
+          message += `Olá, ${heroName}! Você ainda tem as seguintes missões pendentes:\n\n`;
+          
+          incompleteToday.forEach((q, index) => {
+            const difficultyEmoji = q.difficulty === 'legendary' ? '🟣' : q.difficulty === 'hard' ? '🔴' : q.difficulty === 'medium' ? '🟡' : '🟢';
+            message += `${index + 1}. ${difficultyEmoji} *${q.title}*\n`;
+          });
+          
+          message += `\n👉 Acesse para completar: https://questlog-app-a5e29.web.app/`;
+          await sendWhatsApp(message);
+        } else {
+          console.log(`User ${userDoc.id} (${heroName}): All quests completed! No notification needed.`);
+        }
       }
     }
   } catch (error) {
@@ -102,7 +127,7 @@ async function notifyIncompleteQuests() {
   process.exit(0);
 }
 
-notifyIncompleteQuests().catch(err => {
+notifyQuests().catch(err => {
   console.error('❌ Critical Error:', err);
   process.exit(1);
 });
