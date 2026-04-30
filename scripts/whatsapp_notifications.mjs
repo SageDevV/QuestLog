@@ -25,15 +25,47 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   process.exit(1);
 }
 
-// Parse command line arguments
-const args = process.argv.slice(2);
-const isMorning = args.includes('--morning');
-const isEvening = args.includes('--evening') || (!isMorning); // Default to evening if none specified
-
 const db = admin.firestore();
 
+// Configuration
 const CALLMEBOT_API_KEY = process.env.CALLMEBOT_API_KEY;
 const PHONE_NUMBER = process.env.RECIPIENT_PHONE_NUMBER;
+
+// Get current time in Sao Paulo components
+const formatter = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'America/Sao_Paulo',
+  year: 'numeric', month: 'numeric', day: 'numeric',
+  hour: 'numeric', minute: 'numeric', second: 'numeric',
+  hour12: false
+});
+
+const parts = formatter.formatToParts(now).reduce((acc, part) => {
+  acc[part.type] = part.value;
+  return acc;
+}, {});
+
+// Create a date string in ISO format with BRT offset (-03:00)
+// Format: YYYY-MM-DDTHH:MM:SS-03:00
+const pad = (n) => String(n).padStart(2, '0');
+const brtIsoStr = `${parts.year}-${pad(parts.month)}-${pad(parts.day)}T${pad(parts.hour)}:${pad(parts.minute)}:${pad(parts.second)}-03:00`;
+const brtNow = new Date(brtIsoStr);
+const brtHour = brtNow.getHours(); // This might be local hour, but we want the BRT hour we just parsed
+const brtHourNum = parseInt(parts.hour);
+
+// Parse command line arguments or auto-detect
+const args = process.argv.slice(2);
+let isMorning = args.includes('--morning');
+let isEvening = args.includes('--evening');
+let isTest = args.includes('--test');
+
+if (!isMorning && !isEvening && !isTest) {
+  // Auto-detect based on hour (BRT)
+  // Morning: 5:00 to 12:00
+  // Evening: 17:00 to 23:00
+  isMorning = brtHourNum >= 5 && brtHourNum < 12;
+  isEvening = !isMorning; 
+  console.log(`ℹ️ Auto-detected mode: ${isMorning ? 'MORNING' : 'EVENING'} based on BRT hour ${brtHourNum}`);
+}
 
 async function sendWhatsApp(text) {
   if (!CALLMEBOT_API_KEY || !PHONE_NUMBER) {
@@ -41,8 +73,11 @@ async function sendWhatsApp(text) {
     return;
   }
 
+  const maskedKey = CALLMEBOT_API_KEY.substring(0, 4) + '****';
   const url = `https://api.callmebot.com/whatsapp.php?phone=${PHONE_NUMBER}&text=${encodeURIComponent(text)}&apikey=${CALLMEBOT_API_KEY}&source=php`;
   
+  console.log(`📤 Sending to ${PHONE_NUMBER} via CallMeBot (API Key: ${maskedKey})...`);
+
   try {
     const response = await fetch(url);
     const data = await response.text();
@@ -57,43 +92,44 @@ async function sendWhatsApp(text) {
 }
 
 async function notifyQuests() {
+  if (isTest) {
+    console.log('🧪 Running TEST notification...');
+    await sendWhatsApp(`🚀 *MissionLog: Teste de Notificação*\n\nSe você recebeu isso, a integração com o GitHub Actions está funcionando!\n\nHora atual: ${brtNow.toLocaleString('pt-BR')}`);
+    return;
+  }
+
   const mode = isMorning ? 'MANHÃ' : 'NOITE';
-  console.log(`--- Starting Notification Script [Mode: ${mode}] ---`);
+  console.log(`--- Starting Notification Script [Mode: ${mode}] [BRT: ${brtNow.toLocaleString('pt-BR')}] ---`);
   
-  // Forçar o cálculo da data para o fuso horário de Brasília (America/Sao_Paulo)
-  // Isso evita que o script pule de dia se o GitHub Actions rodar com atraso após as 21:00 BRT (00:00 UTC)
-  const now = new Date();
-  const dateInBRT = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Sao_Paulo',
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric'
-  }).format(now);
+  // Calculate range for "Today" in BRT (Midnight to Midnight BRT)
+  const midnightIsoStr = `${parts.year}-${pad(parts.month)}-${pad(parts.day)}T00:00:00-03:00`;
+  const startTs = new Date(midnightIsoStr).getTime();
+  const endTs = startTs + 86400000;
   
-  const today = new Date(dateInBRT);
-  today.setHours(0, 0, 0, 0);
-  const start = today.getTime();
-  const end = start + 86400000;
-  
-  const dateStr = today.toLocaleDateString('pt-BR');
-  console.log(`Checking quests for date: ${dateStr}`);
+  const dateStr = `${pad(parts.day)}/${pad(parts.month)}/${parts.year}`;
+  console.log(`🔍 Checking quests for date range: ${new Date(startTs).toISOString()} to ${new Date(endTs).toISOString()}`);
 
   try {
     const snapshot = await db.collection('users').get();
+    console.log(`👥 Found ${snapshot.size} users in Firestore.`);
 
     for (const userDoc of snapshot.docs) {
       const data = userDoc.data();
       const heroName = data.hero?.name || 'Heroi';
       const quests = data.quests || [];
       
+      console.log(`👤 User: ${userDoc.id} (${heroName}) | Total Quests: ${quests.length}`);
+
       const questsToday = quests.filter(q => 
-        q.scheduledDate >= start && 
-        q.scheduledDate < end
+        q.scheduledDate >= startTs && 
+        q.scheduledDate < endTs
       );
+
+      console.log(`   └─ Quests today: ${questsToday.length}`);
 
       if (isMorning) {
         if (questsToday.length > 0) {
-          console.log(`User ${userDoc.id} (${heroName}): Sending morning list with ${questsToday.length} quests.`);
+          console.log(`   └─ Sending morning list.`);
           
           let message = `☀️ *MissionLog: Missões de Hoje* (${dateStr})\n\n`;
           message += `Olá, ${heroName}! Aqui estão suas missões para hoje:\n\n`;
@@ -106,13 +142,14 @@ async function notifyQuests() {
           message += `\n👉 Boa sorte! https://questlog-app-a5e29.web.app/`;
           await sendWhatsApp(message);
         } else {
-          console.log(`User ${userDoc.id} (${heroName}): No quests scheduled for today.`);
+          console.log(`   └─ No quests for today. Skipping.`);
         }
       } else {
         const incompleteToday = questsToday.filter(q => !q.completed);
+        console.log(`   └─ Incomplete quests today: ${incompleteToday.length}`);
         
         if (incompleteToday.length > 0) {
-          console.log(`User ${userDoc.id} (${heroName}): ${incompleteToday.length} incomplete quests found.`);
+          console.log(`   └─ Sending evening list.`);
           
           let message = `⚠️ *MissionLog: Pendências de Hoje* (${dateStr})\n\n`;
           message += `Olá, ${heroName}! Você ainda tem as seguintes missões pendentes:\n\n`;
@@ -125,7 +162,7 @@ async function notifyQuests() {
           message += `\n👉 Acesse para completar: https://questlog-app-a5e29.web.app/`;
           await sendWhatsApp(message);
         } else {
-          console.log(`User ${userDoc.id} (${heroName}): All quests completed! No notification needed.`);
+          console.log(`   └─ All completed! Skipping.`);
         }
       }
     }
@@ -134,10 +171,12 @@ async function notifyQuests() {
   }
 
   console.log('--- Notification Script Finished ---');
-  process.exit(0);
 }
 
-notifyQuests().catch(err => {
+notifyQuests().then(() => {
+  process.exit(0);
+}).catch(err => {
   console.error('❌ Critical Error:', err);
   process.exit(1);
 });
+

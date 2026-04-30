@@ -4,7 +4,18 @@ on:
   schedule:
     - cron: '5 10 * * *' # 07:05 BRT
     - cron: '0 23 * * *' # 20:00 BRT
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Notification Mode'
+        required: true
+        default: 'auto'
+        type: choice
+        options:
+          - auto
+          - morning
+          - evening
+          - test
 
 jobs:
   notify:
@@ -40,13 +51,25 @@ jobs:
           CALLMEBOT_API_KEY: ${{ secrets.CALLMEBOT_API_KEY }}
           RECIPIENT_PHONE_NUMBER: ${{ secrets.RECIPIENT_PHONE_NUMBER }}
         run: |
-          if [ "${{ github.event.schedule }}" == "5 10 * * *" ]; then
-            echo "Running MORNING notification (07:05 BRT)"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            MODE="${{ github.event.inputs.mode }}"
+            echo "Trigger: Manual ($MODE)"
+            if [[ "$MODE" == "morning" ]]; then
+              node scripts/whatsapp_notifications.mjs --morning
+            elif [[ "$MODE" == "evening" ]]; then
+              node scripts/whatsapp_notifications.mjs --evening
+            elif [[ "$MODE" == "test" ]]; then
+              node scripts/whatsapp_notifications.mjs --test
+            else
+              node scripts/whatsapp_notifications.mjs
+            fi
+          elif [[ "${{ github.event.schedule }}" == "5 10 * * *" ]]; then
+            echo "Trigger: Morning Cron"
             node scripts/whatsapp_notifications.mjs --morning
-          elif [ "${{ github.event.schedule }}" == "0 23 * * *" ]; then
-            echo "Running EVENING notification (20:00 BRT)"
+          elif [[ "${{ github.event.schedule }}" == "0 23 * * *" ]]; then
+            echo "Trigger: Evening Cron"
             node scripts/whatsapp_notifications.mjs --evening
           else
-            echo "Manual trigger or other event: running evening notification by default"
-            node scripts/whatsapp_notifications.mjs --evening
+            echo "Trigger: Other - Auto-detecting mode"
+            node scripts/whatsapp_notifications.mjs
           fi
