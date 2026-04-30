@@ -13,6 +13,7 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   try {
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
     console.log(`ℹ️ Initializing Firebase Admin for project: ${serviceAccount.project_id}`);
+    console.log(`ℹ️ Service Account Email: ${serviceAccount.client_email}`);
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount)
     });
