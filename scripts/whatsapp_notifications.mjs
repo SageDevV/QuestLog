@@ -174,7 +174,7 @@ async function notifyQuests() {
       }
     }
   } catch (error) {
-    console.error('❌ Error fetching data from Firestore:', error.message);
+    console.error('❌ Error fetching data from Firestore:', error);
   }
 
   console.log('--- Notification Script Finished ---');
