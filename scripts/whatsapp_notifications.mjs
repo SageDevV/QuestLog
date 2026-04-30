@@ -74,18 +74,23 @@ async function sendWhatsApp(text) {
     return;
   }
 
+  // Ensure phone number has no '+' prefix
+  const cleanPhone = PHONE_NUMBER.replace('+', '').trim();
   const maskedKey = CALLMEBOT_API_KEY.substring(0, 4) + '****';
-  const url = `https://api.callmebot.com/whatsapp.php?phone=${PHONE_NUMBER}&text=${encodeURIComponent(text)}&apikey=${CALLMEBOT_API_KEY}&source=php`;
+  const url = `https://api.callmebot.com/whatsapp.php?phone=${cleanPhone}&text=${encodeURIComponent(text)}&apikey=${CALLMEBOT_API_KEY}&source=php`;
   
-  console.log(`📤 Sending to ${PHONE_NUMBER} via CallMeBot (API Key: ${maskedKey})...`);
+  console.log(`📤 Sending to ${cleanPhone} via CallMeBot (API Key: ${maskedKey})...`);
 
   try {
     const response = await fetch(url);
     const data = await response.text();
-    if (data.includes('APIKey is invalid') || data.includes('error')) {
-      console.error(`❌ CallMeBot Error: ${data}`);
+    console.log(`📡 CallMeBot Response Status: ${response.status}`);
+    console.log(`📡 CallMeBot Raw Response: ${data}`);
+
+    if (data.includes('APIKey is invalid') || data.includes('error') || response.status !== 200) {
+      console.error(`❌ CallMeBot Error detected in response.`);
     } else {
-      console.log('✅ WhatsApp message sent successfully');
+      console.log('✅ WhatsApp message request accepted by CallMeBot');
     }
   } catch (error) {
     console.error('❌ Error sending WhatsApp message:', error.message);
