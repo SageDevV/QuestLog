@@ -5,13 +5,14 @@ import type { Quest, Hero } from './types';
 
 interface UserData {
   userName?: string;
+  email?: string;
   taskCount?: number;
   hero: Hero;
   quests: Quest[];
 }
 
 /** Load user data from Firestore into the local Zustand store */
-export async function loadUserData(uid: string): Promise<void> {
+export async function loadUserData(uid: string, email?: string | null): Promise<void> {
   try {
     const docRef = doc(db, 'users', uid);
     const docSnap = await getDoc(docRef);
@@ -26,7 +27,7 @@ export async function loadUserData(uid: string): Promise<void> {
       });
     } else {
       // First login: migrate current localStorage data to Firestore
-      await saveUserData(uid);
+      await saveUserData(uid, email);
     }
   } catch (error) {
     console.error('Erro ao carregar dados do Firestore:', error);
@@ -34,16 +35,22 @@ export async function loadUserData(uid: string): Promise<void> {
 }
 
 /** Save current Zustand store data to Firestore */
-export async function saveUserData(uid: string): Promise<void> {
+export async function saveUserData(uid: string, email?: string | null): Promise<void> {
   try {
     const { hero, quests } = useStore.getState();
     const docRef = doc(db, 'users', uid);
-    await setDoc(docRef, { 
+    const dataToSave: any = { 
       userName: hero.name,
       taskCount: quests.length,
       hero, 
       quests 
-    }, { merge: true });
+    };
+    
+    if (email) {
+      dataToSave.email = email;
+    }
+
+    await setDoc(docRef, dataToSave, { merge: true });
   } catch (error) {
     console.error('Erro ao salvar dados no Firestore:', error);
   }

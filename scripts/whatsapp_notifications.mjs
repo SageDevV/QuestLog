@@ -121,10 +121,18 @@ async function notifyQuests() {
 
     for (const userDoc of snapshot.docs) {
       const data = userDoc.data();
+      const userEmail = data.email || '';
+      
+      // RESTRICTION: Only send to pandredbz@gmail.com
+      if (userEmail !== 'pandredbz@gmail.com') {
+        console.log(`⏩ Skipping user ${userDoc.id} (Email: ${userEmail || 'N/A'}) - Feature restricted.`);
+        continue;
+      }
+
       const heroName = data.hero?.name || 'Heroi';
       const quests = data.quests || [];
       
-      console.log(`👤 User: ${userDoc.id} (${heroName}) | Total Quests: ${quests.length}`);
+      console.log(`👤 User: ${userDoc.id} (${heroName}) [${userEmail}] | Total Quests: ${quests.length}`);
 
       const questsToday = quests.filter(q => 
         q.scheduledDate >= startTs && 
