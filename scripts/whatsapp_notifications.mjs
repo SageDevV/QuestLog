@@ -32,6 +32,7 @@ const CALLMEBOT_API_KEY = process.env.CALLMEBOT_API_KEY;
 const PHONE_NUMBER = process.env.RECIPIENT_PHONE_NUMBER;
 
 // Get current time in Sao Paulo components
+const now = new Date();
 const formatter = new Intl.DateTimeFormat('en-US', {
   timeZone: 'America/Sao_Paulo',
   year: 'numeric', month: 'numeric', day: 'numeric',
