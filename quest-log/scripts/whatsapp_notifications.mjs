@@ -60,7 +60,17 @@ async function notifyQuests() {
   const mode = isMorning ? 'MANHÃ' : 'NOITE';
   console.log(`--- Starting Notification Script [Mode: ${mode}] ---`);
   
-  const today = new Date();
+  // Forçar o cálculo da data para o fuso horário de Brasília (America/Sao_Paulo)
+  // Isso evita que o script pule de dia se o GitHub Actions rodar com atraso após as 21:00 BRT (00:00 UTC)
+  const now = new Date();
+  const dateInBRT = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric'
+  }).format(now);
+  
+  const today = new Date(dateInBRT);
   today.setHours(0, 0, 0, 0);
   const start = today.getTime();
   const end = start + 86400000;
