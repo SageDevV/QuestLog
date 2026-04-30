@@ -12,8 +12,6 @@ config();
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   try {
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-    console.log(`ℹ️ Initializing Firebase Admin for project: ${serviceAccount.project_id}`);
-    console.log(`ℹ️ Service Account Email: ${serviceAccount.client_email}`);
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount)
     });
@@ -175,7 +173,7 @@ async function notifyQuests() {
       }
     }
   } catch (error) {
-    console.error('❌ Error fetching data from Firestore:', error);
+    console.error('❌ Error fetching data from Firestore:', error.message);
   }
 
   console.log('--- Notification Script Finished ---');

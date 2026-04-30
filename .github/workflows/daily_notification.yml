@@ -2,7 +2,7 @@ name: Daily WhatsApp Notification
 
 on:
   schedule:
-    - cron: '5 10 * * *' # 07:05 BRT
+    - cron: '0 11 * * *' # 08:00 BRT
     - cron: '0 23 * * *' # 20:00 BRT
   workflow_dispatch:
     inputs:
@@ -63,7 +63,7 @@ jobs:
             else
               node scripts/whatsapp_notifications.mjs
             fi
-          elif [[ "${{ github.event.schedule }}" == "5 10 * * *" ]]; then
+          elif [[ "${{ github.event.schedule }}" == "0 11 * * *" ]]; then
             echo "Trigger: Morning Cron"
             node scripts/whatsapp_notifications.mjs --morning
           elif [[ "${{ github.event.schedule }}" == "0 23 * * *" ]]; then
