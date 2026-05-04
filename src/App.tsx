@@ -149,6 +149,20 @@ export default function App() {
     }
   }, [dayClearMsg, levelUpMsg, clearDayClearMsg]);
 
+  // Undo Toast timer
+  const undoToastQuestId = useStore(s => s.undoToastQuestId);
+  const setUndoToastQuestId = useStore(s => s.setUndoToastQuestId);
+  const undoCompleteQuestAction = useStore(s => s.undoCompleteQuestAction);
+
+  useEffect(() => {
+    if (undoToastQuestId) {
+      const timer = setTimeout(() => {
+        setUndoToastQuestId(null);
+      }, 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [undoToastQuestId, setUndoToastQuestId]);
+
   // Filter derivations - Optimized with useMemo
   const filtered = useMemo(() => {
     return quests.filter(q => filter === 'active' ? !q.completed : q.completed);
@@ -266,6 +280,21 @@ export default function App() {
         )}
         
         {filter === 'completed' && <QuestList quests={filtered} />}
+        
+        {undoToastQuestId && (
+          <div className="undo-toast">
+            <div className="undo-toast-content">
+              <span className="undo-toast-msg">⚔️ Missão cumprida!</span>
+              <button 
+                className="undo-btn" 
+                onClick={() => undoCompleteQuestAction(undoToastQuestId)}
+              >
+                Desfazer
+              </button>
+            </div>
+            <div className="undo-toast-progress" />
+          </div>
+        )}
       </div>
     </>
   );

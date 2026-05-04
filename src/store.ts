@@ -22,10 +22,13 @@ interface AppState {
   updateQuest: (id: string, updates: Partial<Quest>) => void;
   updateAllMatching: (id: string, updates: Partial<Quest>) => void;
   completeQuestAction: (id: string) => { leveledUp: boolean, isAllDayDone: boolean };
+  undoCompleteQuestAction: (id: string) => void;
   clearLevelUpMsg: () => void;
   dayClearMsg: string;
   clearDayClearMsg: () => void;
   buyShopItem: (cost: number, itemName: string, isBg?: boolean) => boolean;
+  undoToastQuestId: string | null;
+  setUndoToastQuestId: (id: string | null) => void;
 }
 
 export const useStore = create<AppState>()(
@@ -35,6 +38,9 @@ export const useStore = create<AppState>()(
       quests: [],
       levelUpMsg: '',
       dayClearMsg: '',
+      undoToastQuestId: null,
+
+      setUndoToastQuestId: (id) => set({ undoToastQuestId: id }),
 
       setHeroName: (name) => set((s) => ({ hero: { ...s.hero, name } })),
       resetHero: () => set((s) => ({ 
@@ -147,8 +153,36 @@ export const useStore = create<AppState>()(
           dayClearMsg = '🏆 Todas as missões do dia foram concluídas! Vitória!';
         }
 
-        set({ hero: newHero, quests: newQuests, levelUpMsg: localMessage, dayClearMsg });
+        set({ hero: newHero, quests: newQuests, levelUpMsg: localMessage, dayClearMsg, undoToastQuestId: id });
         return { leveledUp, isAllDayDone };
+      },
+
+      undoCompleteQuestAction: (id) => {
+        const state = get();
+        const quest = state.quests.find(q => q.id === id);
+        if (!quest || !quest.completed) return;
+
+        const config = DIFFICULTY_CONFIG[quest.difficulty];
+        let newHero = { ...state.hero };
+        
+        // Revert rewards
+        newHero.xp -= config.xp;
+        newHero.gold -= config.gold;
+        newHero.questsCompleted--;
+
+        // Revert level up if necessary
+        while (newHero.xp < 0 && newHero.level > 1) {
+          newHero.level--;
+          newHero.xpToNext = Math.ceil(newHero.xpToNext / 1.3);
+          newHero.xp += newHero.xpToNext;
+        }
+        if (newHero.xp < 0) newHero.xp = 0;
+
+        newHero.title = getTitle(newHero.level);
+
+        const newQuests = state.quests.map(q => q.id === id ? { ...q, completed: false, completedAt: undefined } : q);
+        
+        set({ hero: newHero, quests: newQuests, dayClearMsg: '', undoToastQuestId: null });
       },
 
       clearLevelUpMsg: () => set({ levelUpMsg: '' }),
