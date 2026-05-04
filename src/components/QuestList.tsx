@@ -13,6 +13,7 @@ export default function QuestList({ quests, highlightHard }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempTitle, setTempTitle] = useState('');
   const [tempDesc, setTempDesc] = useState('');
+  const [tempProgress, setTempProgress] = useState(0);
 
   if (quests.length === 0) return <div className="empty-msg">Nenhum rastro encontrado... O horizonte está limpo e sereno! 🗺️</div>;
 
@@ -20,10 +21,11 @@ export default function QuestList({ quests, highlightHard }: Props) {
     setEditingId(quest.id);
     setTempTitle(quest.title);
     setTempDesc(quest.description || '');
+    setTempProgress(quest.progress || 0);
   };
 
   const handleSave = (id: string) => {
-    updateQuest(id, { title: tempTitle, description: tempDesc });
+    updateQuest(id, { title: tempTitle, description: tempDesc, progress: tempProgress });
     setEditingId(null);
   };
 
@@ -31,6 +33,7 @@ export default function QuestList({ quests, highlightHard }: Props) {
     setEditingId(null);
     setTempTitle('');
     setTempDesc('');
+    setTempProgress(0);
   };
 
   return (
@@ -42,7 +45,14 @@ export default function QuestList({ quests, highlightHard }: Props) {
         const shouldHighlight = highlightHard && !quest.completed && (quest.difficulty === 'hard' || quest.difficulty === 'legendary');
 
         return (
-          <div key={quest.id} className={`quest-card ${quest.completed ? 'completed' : ''} ${shouldHighlight ? 'highlight-danger' : ''}`} style={{ borderLeftColor: cfg.color }}>
+          <div 
+            key={quest.id} 
+            className={`quest-card ${quest.completed ? 'completed' : ''} ${shouldHighlight ? 'highlight-danger' : ''}`} 
+            style={{ 
+              borderLeftColor: cfg.color,
+              background: quest.completed ? undefined : `linear-gradient(90deg, rgba(74, 222, 128, 0.15) ${quest.progress || 0}%, rgba(22, 33, 62, 0.85) ${quest.progress || 0}%)`
+            }}
+          >
             <div className="quest-card-header">
               <span className="quest-difficulty" style={{ color: cfg.color }}>
                 {cfg.emoji} {cfg.label} {quest.tag && <span style={{marginLeft:'6px', background:'rgba(255,255,255,0.1)', padding:'2px 8px', borderRadius:'10px', fontSize:'0.75rem', color:'#fff'}}>{quest.tag}</span>}
@@ -57,6 +67,9 @@ export default function QuestList({ quests, highlightHard }: Props) {
                   ✏️
                 </button>
               )}
+              {quest.progress !== undefined && quest.progress > 0 && !quest.completed && !isEditing && (
+                <span className="quest-progress-badge">{quest.progress}%</span>
+              )}
             </h3>
             
             <div className="quest-description-area">
@@ -70,6 +83,19 @@ export default function QuestList({ quests, highlightHard }: Props) {
                     className="quick-edit-title-input"
                     autoFocus
                   />
+                  
+                  <div className="progress-edit-area">
+                    <label>Progresso: {tempProgress}%</label>
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max="100" 
+                      value={tempProgress} 
+                      onChange={e => setTempProgress(parseInt(e.target.value))}
+                      className="progress-slider"
+                    />
+                  </div>
+
                   <textarea 
                     value={tempDesc} 
                     onChange={e => setTempDesc(e.target.value)}

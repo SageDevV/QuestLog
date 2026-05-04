@@ -18,6 +18,7 @@ export interface Quest {
   completedAt?: number;
   scheduledDate: number;
   recurrenceType?: RecurrenceType;
+  progress?: number;
 }
 
 export interface Hero {
