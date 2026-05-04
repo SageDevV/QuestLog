@@ -50,9 +50,17 @@ export default function QuestList({ quests, highlightHard }: Props) {
             className={`quest-card ${quest.completed ? 'completed' : ''} ${shouldHighlight ? 'highlight-danger' : ''}`} 
             style={{ 
               borderLeftColor: cfg.color,
-              background: quest.completed ? undefined : `linear-gradient(90deg, rgba(74, 222, 128, 0.15) ${quest.progress || 0}%, rgba(22, 33, 62, 0.85) ${quest.progress || 0}%)`
+              background: quest.completed ? undefined : `linear-gradient(90deg, rgba(74, 222, 128, 0.3) ${quest.progress || 0}%, rgba(15, 20, 40, 0.9) ${quest.progress || 0}%)`,
+              position: 'relative',
+              overflow: 'hidden'
             }}
           >
+            {quest.progress !== undefined && quest.progress > 0 && !quest.completed && (
+              <div 
+                className="quest-card-top-bar" 
+                style={{ width: `${quest.progress}%` }}
+              />
+            )}
             <div className="quest-card-header">
               <span className="quest-difficulty" style={{ color: cfg.color }}>
                 {cfg.emoji} {cfg.label} {quest.tag && <span style={{marginLeft:'6px', background:'rgba(255,255,255,0.1)', padding:'2px 8px', borderRadius:'10px', fontSize:'0.75rem', color:'#fff'}}>{quest.tag}</span>}

@@ -530,6 +530,17 @@ body {
 .quest-difficulty { font-weight: 600; }
 .quest-reward { color: var(--gold); }
 
+.quest-card-top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  background: #4ade80;
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.6);
+  z-index: 10;
+  transition: width 0.3s ease;
+}
+
 .quest-progress-badge {
   background: rgba(74, 222, 128, 0.2);
   color: #4ade80;
