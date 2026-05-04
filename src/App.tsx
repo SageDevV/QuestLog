@@ -41,7 +41,7 @@ export default function App() {
   // Load data from Firestore on login
   useEffect(() => {
     if (user && !dataLoaded) {
-      loadUserData(user.uid).then(() => setDataLoaded(true));
+      loadUserData(user.uid, user.email).then(() => setDataLoaded(true));
     }
     if (!user) {
       setDataLoaded(false);
@@ -76,7 +76,7 @@ export default function App() {
 
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     saveTimeoutRef.current = setTimeout(() => {
-      saveUserData(user.uid);
+      saveUserData(user.uid, user.email);
     }, 2000);
 
     return () => {
