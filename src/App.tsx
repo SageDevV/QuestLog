@@ -13,6 +13,7 @@ import QuestCalendar from './components/QuestCalendar';
 import DashboardStats from './components/DashboardStats';
 import ShopTavern from './components/ShopTavern';
 import LoginScreen from './components/LoginScreen';
+import StartJourneyScreen from './components/StartJourneyScreen';
 import WarningScreen from './components/WarningScreen';
 import missionClearSrc from './music_mission_clear.mp3';
 import { bgSuspend, bgResume } from './bgAudio';
@@ -29,6 +30,7 @@ export default function App() {
   const [filter, setFilter] = useState<'active' | 'completed' | 'calendar' | 'dashboard' | 'shop'>('active');
   const [recurrenceFilter, setRecurrenceFilter] = useState<'all' | 'single' | 'daily' | 'weekly'>('all');
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [hasStartedJourney, setHasStartedJourney] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
   const [highlightHardQuests, setHighlightHardQuests] = useState(false);
   const hasSeenWarningRef = useRef(false);
@@ -49,7 +51,7 @@ export default function App() {
 
   // Mega Man X Warning Screen Logic
   useEffect(() => {
-    if (user && dataLoaded && !hasSeenWarningRef.current) {
+    if (user && dataLoaded && hasStartedJourney && !hasSeenWarningRef.current) {
       hasSeenWarningRef.current = true;
       const todayStart = new Date(); todayStart.setHours(0,0,0,0);
       const tomorrowTs = todayStart.getTime() + 86400000;
@@ -66,7 +68,7 @@ export default function App() {
         setShowWarning(true);
       }
     }
-  }, [user, dataLoaded]);
+  }, [user, dataLoaded, hasStartedJourney]);
 
   // Auto-save to Firestore on data changes (debounced)
   useEffect(() => {
@@ -188,6 +190,11 @@ export default function App() {
   // Not logged in
   if (!user) {
     return <LoginScreen />;
+  }
+
+  // Authenticated, but journey hasn't started (fixes autoplay audio blocking)
+  if (!hasStartedJourney) {
+    return <StartJourneyScreen onStart={() => setHasStartedJourney(true)} />;
   }
 
   return (
