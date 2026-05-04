@@ -28,7 +28,6 @@ export default function App() {
   const clearDayClearMsg = useStore(s => s.clearDayClearMsg);
   
   const [filter, setFilter] = useState<'active' | 'completed' | 'calendar' | 'dashboard' | 'shop'>('active');
-  const [recurrenceFilter, setRecurrenceFilter] = useState<'all' | 'single' | 'daily' | 'weekly'>('all');
   const [dataLoaded, setDataLoaded] = useState(false);
   const [hasStartedJourney, setHasStartedJourney] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
@@ -152,12 +151,8 @@ export default function App() {
 
   // Filter derivations - Optimized with useMemo
   const filtered = useMemo(() => {
-    return quests.filter(q => filter === 'active' ? !q.completed : q.completed)
-      .filter(q => {
-        if (filter !== 'active' || recurrenceFilter === 'all') return true;
-        return (q.recurrenceType || 'single') === recurrenceFilter;
-      });
-  }, [quests, filter, recurrenceFilter]);
+    return quests.filter(q => filter === 'active' ? !q.completed : q.completed);
+  }, [quests, filter]);
 
   const { pendingQuests, todayQuests, tomorrowQuests } = useMemo(() => {
     const todayStart = new Date(); todayStart.setHours(0,0,0,0);
@@ -242,16 +237,17 @@ export default function App() {
 
         {filter === 'dashboard' && <DashboardStats />}
         {filter === 'shop' && <ShopTavern />}
-        {filter === 'calendar' && <QuestCalendar quests={quests} onComplete={() => {}} />}
+        {filter === 'calendar' && (
+          <QuestCalendar 
+            quests={quests} 
+            onComplete={useStore.getState().completeQuestAction} 
+            onDelete={useStore.getState().deleteQuest}
+            onDeleteSeries={useStore.getState().deleteAllMatching}
+          />
+        )}
 
         {filter === 'active' && (
           <>
-            {pendingQuests.length > 0 && (
-              <div className="day-section">
-                <h2 className="day-section-title pending">⚠️ Pendentes</h2>
-                <QuestList quests={pendingQuests} highlightHard={highlightHardQuests} />
-              </div>
-            )}
             {todayQuests.length > 0 && (
               <div className="day-section">
                 <h2 className="day-section-title">📌 Hoje</h2>
@@ -264,18 +260,7 @@ export default function App() {
                 <QuestList quests={tomorrowQuests} />
               </div>
             )}
-            <div className="recurrence-filter-bar">
-              {(['all', 'single', 'daily', 'weekly'] as const).map(rt => (
-                <button
-                  key={rt}
-                  className={recurrenceFilter === rt ? 'active' : ''}
-                  onClick={() => setRecurrenceFilter(rt)}
-                >
-                  {rt === 'all' ? 'Todas' : rt === 'single' ? 'Únicas' : rt === 'daily' ? 'Diárias' : 'Semanais'}
-                </button>
-              ))}
-            </div>
-            {pendingQuests.length === 0 && todayQuests.length === 0 && tomorrowQuests.length === 0 && filtered.length > 0 && <QuestList quests={filtered} />}
+            {todayQuests.length === 0 && tomorrowQuests.length === 0 && filtered.length > 0 && <QuestList quests={filtered} />}
           </>
         )}
         

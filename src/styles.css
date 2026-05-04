@@ -1091,12 +1091,42 @@ body {
 .day-panel-quest {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   padding: 10px 12px;
   background: rgba(15, 52, 96, 0.5);
   border-radius: 8px;
   margin-bottom: 8px;
 }
+
+.day-panel-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.delete-icon-btn, .delete-series-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--text-dim);
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-icon-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(233, 69, 96, 0.1); }
+.delete-series-btn:hover { border-color: #facc15; color: #facc15; background: rgba(250, 204, 21, 0.1); }
+
+.day-panel-quest .complete-btn {
+  padding: 4px 8px;
+  font-size: 0.9rem;
+}
+
 
 .day-panel-quest-status {
   font-size: 0.9rem;

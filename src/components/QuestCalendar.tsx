@@ -5,11 +5,13 @@ import { getDaysInMonth, getFirstDayOfWeek, formatMonthYear, groupQuestsByDay } 
 interface QuestCalendarProps {
   quests: Quest[];
   onComplete: (id: string) => void;
+  onDelete: (id: string) => void;
+  onDeleteSeries: (id: string) => void;
 }
 
 const DAY_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
-export default function QuestCalendar({ quests, onComplete }: QuestCalendarProps) {
+export default function QuestCalendar({ quests, onComplete, onDelete, onDeleteSeries }: QuestCalendarProps) {
   const now = new Date();
   const [currentYear, setCurrentYear] = useState(now.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(now.getMonth());
@@ -93,14 +95,34 @@ export default function QuestCalendar({ quests, onComplete }: QuestCalendarProps
                   <span className="day-panel-quest-title">{quest.title}</span>
                   <span className="day-panel-quest-difficulty">{cfg.emoji} {cfg.label}</span>
                   <span className="day-panel-quest-reward">+{cfg.xp}XP +{cfg.gold}⚡</span>
-                  {!quest.completed && (
+                  
+                  <div className="day-panel-actions">
+                    {!quest.completed && (
+                      <button
+                        className="complete-btn"
+                        onClick={(e) => { e.stopPropagation(); onComplete(quest.id); }}
+                        title="Completar Missão"
+                      >
+                        ✅
+                      </button>
+                    )}
                     <button
-                      className="complete-btn"
-                      onClick={(e) => { e.stopPropagation(); onComplete(quest.id); }}
+                      className="delete-icon-btn"
+                      onClick={(e) => { e.stopPropagation(); if(confirm('Excluir esta missão?')) onDelete(quest.id); }}
+                      title="Excluir Missão"
                     >
-                      ✅ Completar
+                      🗑️
                     </button>
-                  )}
+                    {quest.recurrenceType && quest.recurrenceType !== 'single' && (
+                      <button
+                        className="delete-series-btn"
+                        onClick={(e) => { e.stopPropagation(); if(confirm('Destruir toda a CADEIA TEMPORAL desta série?')) onDeleteSeries(quest.id); }}
+                        title="Aniquilar Série"
+                      >
+                        🔄🗑️
+                      </button>
+                    )}
+                  </div>
                 </div>
               );
             })
