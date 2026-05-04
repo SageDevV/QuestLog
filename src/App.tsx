@@ -243,6 +243,7 @@ export default function App() {
             onComplete={useStore.getState().completeQuestAction} 
             onDelete={useStore.getState().deleteQuest}
             onDeleteSeries={useStore.getState().deleteAllMatching}
+            onUpdate={useStore.getState().updateQuest}
           />
         )}
 

@@ -11,22 +11,25 @@ export default function QuestList({ quests, highlightHard }: Props) {
   const updateQuest = useStore(s => s.updateQuest);
 
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [tempTitle, setTempTitle] = useState('');
   const [tempDesc, setTempDesc] = useState('');
 
   if (quests.length === 0) return <div className="empty-msg">Nenhum rastro encontrado... O horizonte está limpo e sereno! 🗺️</div>;
 
   const handleStartEdit = (quest: Quest) => {
     setEditingId(quest.id);
+    setTempTitle(quest.title);
     setTempDesc(quest.description || '');
   };
 
-  const handleSaveDesc = (id: string) => {
-    updateQuest(id, { description: tempDesc });
+  const handleSave = (id: string) => {
+    updateQuest(id, { title: tempTitle, description: tempDesc });
     setEditingId(null);
   };
 
   const handleCancelEdit = () => {
     setEditingId(null);
+    setTempTitle('');
     setTempDesc('');
   };
 
@@ -59,14 +62,21 @@ export default function QuestList({ quests, highlightHard }: Props) {
             <div className="quest-description-area">
               {isEditing ? (
                 <div className="quick-edit-desc">
+                  <input 
+                    type="text"
+                    value={tempTitle}
+                    onChange={e => setTempTitle(e.target.value)}
+                    placeholder="Título da missão..."
+                    className="quick-edit-title-input"
+                    autoFocus
+                  />
                   <textarea 
                     value={tempDesc} 
                     onChange={e => setTempDesc(e.target.value)}
                     placeholder="Descreva os detalhes da missão..."
-                    autoFocus
                   />
                   <div className="quick-edit-actions">
-                    <button onClick={() => handleSaveDesc(quest.id)} className="save-desc-btn">Salvar</button>
+                    <button onClick={() => handleSave(quest.id)} className="save-desc-btn">Salvar</button>
                     <button onClick={handleCancelEdit} className="cancel-desc-btn">Cancelar</button>
                   </div>
                 </div>
