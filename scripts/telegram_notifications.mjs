@@ -1,9 +1,10 @@
 /**
- * Script to send WhatsApp notifications for incomplete quests.
- * Uses firebase-admin to bypass client-side rules and CallMeBot API.
+ * Script to send Telegram notifications for incomplete quests.
+ * Uses firebase-admin to bypass client-side rules and Telegram Bot API.
  */
 import admin from 'firebase-admin';
 import { config } from 'dotenv';
+import axios from 'axios';
 
 // Load environment variables
 config();
@@ -28,8 +29,8 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
 const db = admin.firestore();
 
 // Configuration
-const CALLMEBOT_API_KEY = process.env.CALLMEBOT_API_KEY;
-const PHONE_NUMBER = process.env.RECIPIENT_PHONE_NUMBER;
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
 // Get current time in Sao Paulo components
 const now = new Date();
@@ -46,11 +47,9 @@ const parts = formatter.formatToParts(now).reduce((acc, part) => {
 }, {});
 
 // Create a date string in ISO format with BRT offset (-03:00)
-// Format: YYYY-MM-DDTHH:MM:SS-03:00
 const pad = (n) => String(n).padStart(2, '0');
 const brtIsoStr = `${parts.year}-${pad(parts.month)}-${pad(parts.day)}T${pad(parts.hour)}:${pad(parts.minute)}:${pad(parts.second)}-03:00`;
 const brtNow = new Date(brtIsoStr);
-const brtHour = brtNow.getHours(); // This might be local hour, but we want the BRT hour we just parsed
 const brtHourNum = parseInt(parts.hour);
 
 // Parse command line arguments or auto-detect
@@ -62,45 +61,47 @@ let isTest = args.includes('--test');
 if (!isMorning && !isEvening && !isTest) {
   // Auto-detect based on hour (BRT)
   // Morning: 5:00 to 12:00
-  // Evening: 17:00 to 23:00
   isMorning = brtHourNum >= 5 && brtHourNum < 12;
   isEvening = !isMorning; 
   console.log(`ℹ️ Auto-detected mode: ${isMorning ? 'MORNING' : 'EVENING'} based on BRT hour ${brtHourNum}`);
 }
 
-async function sendWhatsApp(text) {
-  if (!CALLMEBOT_API_KEY || !PHONE_NUMBER) {
-    console.error('❌ CallMeBot API Key or Phone Number missing');
+async function sendTelegram(text) {
+  if (!BOT_TOKEN || !CHAT_ID) {
+    console.error('❌ Telegram Bot Token or Chat ID missing');
     return;
   }
 
-  // Ensure phone number has no '+' prefix
-  const cleanPhone = PHONE_NUMBER.replace('+', '').trim();
-  const maskedKey = CALLMEBOT_API_KEY.substring(0, 4) + '****';
-  const url = `https://api.callmebot.com/whatsapp.php?phone=${cleanPhone}&text=${encodeURIComponent(text)}&apikey=${CALLMEBOT_API_KEY}&source=php`;
+  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
   
-  console.log(`📤 Sending to ${cleanPhone} via CallMeBot (API Key: ${maskedKey})...`);
+  console.log(`📤 Sending to Telegram Chat ${CHAT_ID}...`);
 
   try {
-    const response = await fetch(url);
-    const data = await response.text();
-    console.log(`📡 CallMeBot Response Status: ${response.status}`);
-    console.log(`📡 CallMeBot Raw Response: ${data}`);
+    const response = await axios.post(url, {
+      chat_id: CHAT_ID,
+      text: text,
+      parse_mode: 'HTML',
+      disable_web_page_preview: false
+    });
 
-    if (data.includes('APIKey is invalid') || data.includes('error') || response.status !== 200) {
-      console.error(`❌ CallMeBot Error detected in response.`);
+    if (response.data && response.data.ok) {
+      console.log('✅ Telegram message sent successfully');
     } else {
-      console.log('✅ WhatsApp message request accepted by CallMeBot');
+      console.error(`❌ Telegram API returned error: ${JSON.stringify(response.data)}`);
     }
   } catch (error) {
-    console.error('❌ Error sending WhatsApp message:', error.message);
+    if (error.response) {
+      console.error(`❌ Telegram API returned status ${error.response.status}: ${JSON.stringify(error.response.data)}`);
+    } else {
+      console.error('❌ Error sending Telegram message:', error.message);
+    }
   }
 }
 
 async function notifyQuests() {
   if (isTest) {
     console.log('🧪 Running TEST notification...');
-    await sendWhatsApp(`🚀 *MissionLog: Teste de Notificação*\n\nSe você recebeu isso, a integração com o GitHub Actions está funcionando!\n\nHora atual: ${brtNow.toLocaleString('pt-BR')}`);
+    await sendTelegram(`🚀 <b>MissionLog: Teste de Notificação</b>\n\nSe você recebeu isso, a integração com o GitHub Actions via Telegram está funcionando!\n\nHora atual: ${brtNow.toLocaleString('pt-BR')}`);
     return;
   }
 
@@ -113,7 +114,6 @@ async function notifyQuests() {
   const endTs = startTs + 86400000;
   
   const dateStr = `${pad(parts.day)}/${pad(parts.month)}/${parts.year}`;
-  console.log(`🔍 Checking quests for date range: ${new Date(startTs).toISOString()} to ${new Date(endTs).toISOString()}`);
 
   try {
     const snapshot = await db.collection('users').get();
@@ -125,58 +125,44 @@ async function notifyQuests() {
       
       // RESTRICTION: Only send to pandredbz@gmail.com
       if (userEmail !== 'pandredbz@gmail.com') {
-        console.log(`⏩ Skipping user ${userDoc.id} (Email: ${userEmail || 'N/A'}) - Feature restricted.`);
         continue;
       }
 
       const heroName = data.hero?.name || 'Heroi';
       const quests = data.quests || [];
       
-      console.log(`👤 User: ${userDoc.id} (${heroName}) [${userEmail}] | Total Quests: ${quests.length}`);
-
       const questsToday = quests.filter(q => 
         q.scheduledDate >= startTs && 
         q.scheduledDate < endTs
       );
 
-      console.log(`   └─ Quests today: ${questsToday.length}`);
-
       if (isMorning) {
         if (questsToday.length > 0) {
-          console.log(`   └─ Sending morning list.`);
-          
-          let message = `☀️ *MissionLog: Missões de Hoje* (${dateStr})\n\n`;
+          let message = `☀️ <b>MissionLog: Missões de Hoje</b> (${dateStr})\n\n`;
           message += `Olá, ${heroName}! Aqui estão suas missões para hoje:\n\n`;
           
           questsToday.forEach((q, index) => {
             const status = q.completed ? '✅' : (q.difficulty === 'legendary' ? '🟣' : q.difficulty === 'hard' ? '🔴' : q.difficulty === 'medium' ? '🟡' : '🟢');
-            message += `${index + 1}. ${status} *${q.title}*\n`;
+            message += `${index + 1}. ${status} <b>${q.title}</b>\n`;
           });
           
-          message += `\n👉 Boa sorte! https://questlog-app-a5e29.web.app/`;
-          await sendWhatsApp(message);
-        } else {
-          console.log(`   └─ No quests for today. Skipping.`);
+          message += `\n👉 <a href="https://questlog-app-a5e29.web.app/">Boa sorte!</a>`;
+          await sendTelegram(message);
         }
       } else {
         const incompleteToday = questsToday.filter(q => !q.completed);
-        console.log(`   └─ Incomplete quests today: ${incompleteToday.length}`);
         
         if (incompleteToday.length > 0) {
-          console.log(`   └─ Sending evening list.`);
-          
-          let message = `⚠️ *MissionLog: Pendências de Hoje* (${dateStr})\n\n`;
+          let message = `⚠️ <b>MissionLog: Pendências de Hoje</b> (${dateStr})\n\n`;
           message += `Olá, ${heroName}! Você ainda tem as seguintes missões pendentes:\n\n`;
           
           incompleteToday.forEach((q, index) => {
             const difficultyEmoji = q.difficulty === 'legendary' ? '🟣' : q.difficulty === 'hard' ? '🔴' : q.difficulty === 'medium' ? '🟡' : '🟢';
-            message += `${index + 1}. ${difficultyEmoji} *${q.title}*\n`;
+            message += `${index + 1}. ${difficultyEmoji} <b>${q.title}</b>\n`;
           });
           
-          message += `\n👉 Acesse para completar: https://questlog-app-a5e29.web.app/`;
-          await sendWhatsApp(message);
-        } else {
-          console.log(`   └─ All completed! Skipping.`);
+          message += `\n👉 <a href="https://questlog-app-a5e29.web.app/">Acesse para completar</a>`;
+          await sendTelegram(message);
         }
       }
     }
@@ -193,4 +179,3 @@ notifyQuests().then(() => {
   console.error('❌ Critical Error:', err);
   process.exit(1);
 });
-
