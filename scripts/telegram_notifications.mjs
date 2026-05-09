@@ -4,7 +4,6 @@
  */
 import admin from 'firebase-admin';
 import { config } from 'dotenv';
-import axios from 'axios';
 
 // Load environment variables
 config();
@@ -77,24 +76,28 @@ async function sendTelegram(text) {
   console.log(`📤 Sending to Telegram Chat ${CHAT_ID}...`);
 
   try {
-    const response = await axios.post(url, {
-      chat_id: CHAT_ID,
-      text: text,
-      parse_mode: 'HTML',
-      disable_web_page_preview: false
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: text,
+        parse_mode: 'HTML',
+        disable_web_page_preview: false
+      })
     });
 
-    if (response.data && response.data.ok) {
+    const data = await response.json();
+
+    if (data && data.ok) {
       console.log('✅ Telegram message sent successfully');
     } else {
-      console.error(`❌ Telegram API returned error: ${JSON.stringify(response.data)}`);
+      console.error(`❌ Telegram API returned error: ${JSON.stringify(data)}`);
     }
   } catch (error) {
-    if (error.response) {
-      console.error(`❌ Telegram API returned status ${error.response.status}: ${JSON.stringify(error.response.data)}`);
-    } else {
-      console.error('❌ Error sending Telegram message:', error.message);
-    }
+    console.error('❌ Error sending Telegram message:', error.message);
   }
 }
 
