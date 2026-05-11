@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Quest, DIFFICULTY_CONFIG } from '../types';
+import { Quest, DIFFICULTY_CONFIG, AGENT_CONFIG } from '../types';
 import { getDaysInMonth, getFirstDayOfWeek, formatMonthYear, groupQuestsByDay } from '../calendarUtils';
 
 interface QuestCalendarProps {
@@ -140,6 +140,7 @@ export default function QuestCalendar({ quests, onComplete, onDelete, onDeleteSe
                       <span className="day-panel-quest-status">{quest.completed ? '✅' : '📋'}</span>
                       <span className="day-panel-quest-title">{quest.title}</span>
                       <span className="day-panel-quest-difficulty">{cfg.emoji} {cfg.label}</span>
+                      {quest.agentLabel && (() => { const acfg = AGENT_CONFIG[quest.agentLabel]; return <span className="agent-badge" style={{background: acfg.bg, color: acfg.color, border: `1px solid ${acfg.color}`, padding:'2px 6px', borderRadius:'10px', fontSize:'0.65rem', fontWeight:600}}>{acfg.emoji} {quest.agentLabel}</span>; })()}
                       <span className="day-panel-quest-reward">+{cfg.xp}XP +{cfg.gold}⚡</span>
                       
                       <div className="day-panel-actions">

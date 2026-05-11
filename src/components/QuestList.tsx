@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Quest, DIFFICULTY_CONFIG } from '../types';
+import { Quest, DIFFICULTY_CONFIG, QuestAgent, AGENT_CONFIG } from '../types';
 import { useStore } from '../store';
 
 interface Props { quests: Quest[]; highlightHard?: boolean; }
@@ -14,6 +14,7 @@ export default function QuestList({ quests, highlightHard }: Props) {
   const [tempTitle, setTempTitle] = useState('');
   const [tempDesc, setTempDesc] = useState('');
   const [tempProgress, setTempProgress] = useState(0);
+  const [tempAgent, setTempAgent] = useState<QuestAgent | undefined>(undefined);
 
   if (quests.length === 0) return <div className="empty-msg">Nenhum rastro encontrado... O horizonte está limpo e sereno! 🗺️</div>;
 
@@ -22,10 +23,11 @@ export default function QuestList({ quests, highlightHard }: Props) {
     setTempTitle(quest.title);
     setTempDesc(quest.description || '');
     setTempProgress(quest.progress || 0);
+    setTempAgent(quest.agentLabel);
   };
 
   const handleSave = (id: string) => {
-    updateQuest(id, { title: tempTitle, description: tempDesc, progress: tempProgress });
+    updateQuest(id, { title: tempTitle, description: tempDesc, progress: tempProgress, agentLabel: tempAgent });
     setEditingId(null);
   };
 
@@ -34,6 +36,7 @@ export default function QuestList({ quests, highlightHard }: Props) {
     setTempTitle('');
     setTempDesc('');
     setTempProgress(0);
+    setTempAgent(undefined);
   };
 
   return (
@@ -65,6 +68,7 @@ export default function QuestList({ quests, highlightHard }: Props) {
               <span className="quest-difficulty" style={{ color: cfg.color }}>
                 {cfg.emoji} {cfg.label} {quest.tag && <span style={{marginLeft:'6px', background:'rgba(255,255,255,0.1)', padding:'2px 8px', borderRadius:'10px', fontSize:'0.75rem', color:'#fff'}}>{quest.tag}</span>}
               </span>
+              {quest.agentLabel && (() => { const acfg = AGENT_CONFIG[quest.agentLabel]; return <span className="agent-badge" style={{background: acfg.bg, color: acfg.color, border: `1px solid ${acfg.color}`, padding:'2px 8px', borderRadius:'12px', fontSize:'0.7rem', fontWeight:600, marginLeft:'4px', whiteSpace:'nowrap'}}>{acfg.emoji} {quest.agentLabel}</span>; })()}
               <span className="quest-reward">+{cfg.xp} XP | +{cfg.gold} ⚡</span>
             </div>
             
@@ -112,6 +116,17 @@ export default function QuestList({ quests, highlightHard }: Props) {
                   <div className="quick-edit-actions">
                     <button onClick={() => handleSave(quest.id)} className="save-desc-btn">Salvar</button>
                     <button onClick={handleCancelEdit} className="cancel-desc-btn">Cancelar</button>
+                  </div>
+
+                  <div style={{marginTop:'10px'}}>
+                    <span style={{fontSize:'0.8rem', color:'var(--text-dim)', display:'block', marginBottom:'6px'}}>🤖 Executado por:</span>
+                    <div style={{display:'flex', gap:'5px', flexWrap:'wrap'}}>
+                      {(['Claude','Codex','Gemini','Kiro','Manual'] as QuestAgent[]).map(a => {
+                        const acfg = AGENT_CONFIG[a];
+                        const isSel = tempAgent === a;
+                        return <button key={a} type="button" onClick={() => setTempAgent(isSel ? undefined : a)} style={{padding:'4px 10px', background: isSel ? acfg.bg : 'rgba(255,255,255,0.04)', color: isSel ? acfg.color : 'var(--text-dim)', border: `1px solid ${isSel ? acfg.color : 'rgba(255,255,255,0.08)'}`, borderRadius:'16px', cursor:'pointer', fontSize:'0.75rem', fontWeight: isSel ? 600 : 400, transition:'all 0.2s'}}>{acfg.emoji} {a}</button>;
+                      })}
+                    </div>
                   </div>
                 </div>
               ) : (

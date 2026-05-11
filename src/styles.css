@@ -551,6 +551,37 @@ body {
   margin-left: auto;
 }
 
+/* Agent Label Badge */
+.agent-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  letter-spacing: 0.3px;
+  animation: agent-badge-in 0.3s ease;
+}
+
+@keyframes agent-badge-in {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.agent-label-selector {
+  padding: 8px 0;
+}
+
+.agent-label-btn {
+  transition: all 0.2s ease;
+}
+
+.agent-label-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.2);
+}
+
+.agent-label-btn.selected {
+  box-shadow: 0 0 8px currentColor;
+}
+
 .progress-edit-area {
   margin-bottom: 12px;
   background: rgba(255,255,255,0.03);

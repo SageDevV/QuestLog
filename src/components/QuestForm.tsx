@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { QuestDifficulty, DIFFICULTY_CONFIG, RecurrenceType, QuestTag, Quest } from '../types';
+import { QuestDifficulty, DIFFICULTY_CONFIG, RecurrenceType, QuestTag, QuestAgent, AGENT_CONFIG, Quest } from '../types';
 import { generateOccurrences, validateRecurrenceConfig } from '../recurrenceUtils';
 import { useStore } from '../store';
 
 const WEEKDAY_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 const RECURRENCE_OPTIONS: { type: RecurrenceType; label: string }[] = [ { type: 'single', label: 'Única' }, { type: 'daily', label: 'Diária' }, { type: 'weekly', label: 'Semanal' } ];
 const TAGS: QuestTag[] = ['💪 Saúde' , '📚 Estudo' , '💼 Trabalho' , '🎮 Lazer' , '🧙 Magia' , '🗡️ Combate' , '🌎 Explorar'];
+const AGENTS: QuestAgent[] = ['Claude', 'Codex', 'Gemini', 'Kiro', 'Manual'];
 
 export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Quest, onCancel?: () => void }) {
   const addQuest = useStore(s => s.addQuest);
@@ -16,6 +17,7 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
   const [description, setDescription] = useState(initialQuest?.description || '');
   const [difficulty, setDifficulty] = useState<QuestDifficulty>(initialQuest?.difficulty || 'medium');
   const [tag, setTag] = useState<QuestTag>(initialQuest?.tag || '💪 Saúde');
+  const [agentLabel, setAgentLabel] = useState<QuestAgent | undefined>(initialQuest?.agentLabel);
   const [scheduledDate, setScheduledDate] = useState(
     initialQuest ? new Date(initialQuest.scheduledDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
   );
@@ -28,7 +30,7 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (initialQuest) {
-      const updates = { title: title.trim(), description: description.trim(), difficulty, tag, scheduledDate: new Date(scheduledDate + 'T12:00:00').getTime() };
+      const updates = { title: title.trim(), description: description.trim(), difficulty, tag, agentLabel, scheduledDate: new Date(scheduledDate + 'T12:00:00').getTime() };
       if (applyToAll) updateAllMatching(initialQuest.id, updates);
       else updateQuest(initialQuest.id, updates);
       if (onCancel) onCancel();
@@ -49,7 +51,7 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
 
     const timestamps = generateOccurrences(config);
     const quests: Quest[] = timestamps.map(ts => ({
-      id: crypto.randomUUID(), title: title.trim(), description: description.trim(), difficulty, tag, completed: false, createdAt: Date.now(), scheduledDate: ts, recurrenceType
+      id: crypto.randomUUID(), title: title.trim(), description: description.trim(), difficulty, tag, agentLabel, completed: false, createdAt: Date.now(), scheduledDate: ts, recurrenceType
     }));
 
     addQuest(quests);
@@ -85,6 +87,17 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
 
       <div style={{display:'flex', gap:'8px', overflowX:'auto', padding:'10px 0', whiteSpace: 'nowrap'}}>
         {TAGS.map(t => <button type="button" key={t} onClick={()=>setTag(t)} style={{padding:'6px 12px', background: tag === t ? '#4ade80':'rgba(255,255,255,0.05)', color:'#fff', border:'none', borderRadius:'20px', cursor:'pointer', fontSize:'0.85rem'}}>{t}</button>)}
+      </div>
+
+      <div className="agent-label-selector">
+        <span style={{fontSize:'0.8rem', color:'var(--text-dim)', marginBottom:'4px', display:'block'}}>🤖 Executado por:</span>
+        <div style={{display:'flex', gap:'6px', flexWrap:'wrap'}}>
+          {AGENTS.map(a => {
+            const acfg = AGENT_CONFIG[a];
+            const isSelected = agentLabel === a;
+            return <button type="button" key={a} onClick={() => setAgentLabel(isSelected ? undefined : a)} className={`agent-label-btn ${isSelected ? 'selected' : ''}`} style={{padding:'5px 12px', background: isSelected ? acfg.bg : 'rgba(255,255,255,0.04)', color: isSelected ? acfg.color : 'var(--text-dim)', border: `1px solid ${isSelected ? acfg.color : 'rgba(255,255,255,0.08)'}`, borderRadius:'20px', cursor:'pointer', fontSize:'0.8rem', fontWeight: isSelected ? 600 : 400, transition:'all 0.2s'}}>{acfg.emoji} {a}</button>;
+          })}
+        </div>
       </div>
 
       {initialQuest && initialQuest.recurrenceType && initialQuest.recurrenceType !== 'single' && (

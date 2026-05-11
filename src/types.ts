@@ -7,12 +7,23 @@ export type QuestDifficulty = 'easy' | 'medium' | 'hard' | 'legendary';
 
 export type QuestTag = '💪 Saúde' | '📚 Estudo' | '💼 Trabalho' | '🎮 Lazer' | '🧙 Magia' | '🗡️ Combate' | '🌎 Explorar';
 
+export type QuestAgent = 'Claude' | 'Codex' | 'Gemini' | 'Kiro' | 'Manual';
+
+export const AGENT_CONFIG: Record<QuestAgent, { emoji: string; color: string; bg: string }> = {
+  Claude: { emoji: '🟠', color: '#f97316', bg: 'rgba(249,115,22,0.15)' },
+  Codex:  { emoji: '🟢', color: '#22c55e', bg: 'rgba(34,197,94,0.15)' },
+  Gemini: { emoji: '🔵', color: '#3b82f6', bg: 'rgba(59,130,246,0.15)' },
+  Kiro:   { emoji: '🟣', color: '#a855f7', bg: 'rgba(168,85,247,0.15)' },
+  Manual: { emoji: '🔧', color: '#94a3b8', bg: 'rgba(148,163,184,0.15)' },
+};
+
 export interface Quest {
   id: string;
   title: string;
   description: string;
   difficulty: QuestDifficulty;
   tag?: QuestTag;
+  agentLabel?: QuestAgent;
   completed: boolean;
   createdAt: number;
   completedAt?: number;
