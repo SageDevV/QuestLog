@@ -65,10 +65,13 @@ export default function QuestList({ quests, highlightHard }: Props) {
               />
             )}
             <div className="quest-card-header">
-              <span className="quest-difficulty" style={{ color: cfg.color }}>
-                {cfg.emoji} {cfg.label} {quest.tag && <span style={{marginLeft:'6px', background:'rgba(255,255,255,0.1)', padding:'2px 8px', borderRadius:'10px', fontSize:'0.75rem', color:'#fff'}}>{quest.tag}</span>}
-              </span>
-              {quest.agentLabel && (() => { const acfg = AGENT_CONFIG[quest.agentLabel]; return <span className="agent-badge" style={{background: acfg.bg, color: acfg.color, border: `1px solid ${acfg.color}`, padding:'2px 8px', borderRadius:'12px', fontSize:'0.7rem', fontWeight:600, marginLeft:'4px', whiteSpace:'nowrap'}}>{acfg.emoji} {quest.agentLabel}</span>; })()}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                <span className="quest-difficulty" style={{ color: cfg.color }}>
+                  {cfg.emoji} {cfg.label}
+                </span>
+                {quest.tag && <span style={{background:'rgba(255,255,255,0.1)', padding:'2px 8px', borderRadius:'10px', fontSize:'0.75rem', color:'#fff'}}>{quest.tag}</span>}
+                {quest.agentLabel && (() => { const acfg = AGENT_CONFIG[quest.agentLabel]; return <span className="agent-badge" style={{background: acfg.bg, color: acfg.color, border: `1px solid ${acfg.color}`, padding:'2px 8px', borderRadius:'12px', fontSize:'0.7rem', fontWeight:600, whiteSpace:'nowrap'}}>{acfg.emoji} {quest.agentLabel}</span>; })()}
+              </div>
               <span className="quest-reward">+{cfg.xp} XP | +{cfg.gold} ⚡</span>
             </div>
             
