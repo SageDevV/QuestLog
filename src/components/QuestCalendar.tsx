@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Quest, DIFFICULTY_CONFIG, AGENT_CONFIG } from '../types';
+import { Quest, DIFFICULTY_CONFIG, AGENT_CONFIG, QuestAgent } from '../types';
 import { getDaysInMonth, getFirstDayOfWeek, formatMonthYear, groupQuestsByDay } from '../calendarUtils';
 
 interface QuestCalendarProps {
@@ -11,6 +11,7 @@ interface QuestCalendarProps {
 }
 
 const DAY_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+const AGENTS: QuestAgent[] = ['Claude', 'Codex', 'Gemini', 'Kiro', 'Manual'];
 
 export default function QuestCalendar({ quests, onComplete, onDelete, onDeleteSeries, onUpdate }: QuestCalendarProps) {
   const now = new Date();
@@ -21,6 +22,7 @@ export default function QuestCalendar({ quests, onComplete, onDelete, onDeleteSe
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempTitle, setTempTitle] = useState('');
   const [tempDesc, setTempDesc] = useState('');
+  const [tempAgentLabel, setTempAgentLabel] = useState<QuestAgent | undefined>(undefined);
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const firstDay = getFirstDayOfWeek(currentYear, currentMonth);
@@ -55,10 +57,11 @@ export default function QuestCalendar({ quests, onComplete, onDelete, onDeleteSe
     setEditingId(quest.id);
     setTempTitle(quest.title);
     setTempDesc(quest.description || '');
+    setTempAgentLabel(quest.agentLabel);
   };
 
   const handleSave = (id: string) => {
-    onUpdate(id, { title: tempTitle, description: tempDesc });
+    onUpdate(id, { title: tempTitle, description: tempDesc, agentLabel: tempAgentLabel });
     setEditingId(null);
   };
 
@@ -66,6 +69,7 @@ export default function QuestCalendar({ quests, onComplete, onDelete, onDeleteSe
     setEditingId(null);
     setTempTitle('');
     setTempDesc('');
+    setTempAgentLabel(undefined);
   };
 
   const selectedQuests = selectedDay ? questsByDay.get(selectedDay) ?? [] : [];
@@ -130,7 +134,37 @@ export default function QuestCalendar({ quests, onComplete, onDelete, onDeleteSe
                         onChange={e => setTempDesc(e.target.value)}
                         placeholder="Descrição..."
                       />
-                      <div className="quick-edit-actions">
+                      <div className="agent-label-selector" style={{ marginTop: '8px' }}>
+                        <span style={{fontSize:'0.75rem', color:'var(--text-dim)', marginBottom:'4px', display:'block'}}>🤖 Executado por:</span>
+                        <div style={{display:'flex', gap:'4px', flexWrap:'wrap'}}>
+                          {AGENTS.map(a => {
+                            const acfg = AGENT_CONFIG[a];
+                            const isSelected = tempAgentLabel === a;
+                            return (
+                              <button 
+                                type="button" 
+                                key={a} 
+                                onClick={() => setTempAgentLabel(isSelected ? undefined : a)} 
+                                className={`agent-label-btn ${isSelected ? 'selected' : ''}`} 
+                                style={{
+                                  padding:'4px 8px', 
+                                  background: isSelected ? acfg.bg : 'rgba(255,255,255,0.04)', 
+                                  color: isSelected ? acfg.color : 'var(--text-dim)', 
+                                  border: `1px solid ${isSelected ? acfg.color : 'rgba(255,255,255,0.08)'}`, 
+                                  borderRadius:'12px', 
+                                  cursor:'pointer', 
+                                  fontSize:'0.7rem', 
+                                  fontWeight: isSelected ? 600 : 400, 
+                                  transition:'all 0.2s'
+                                }}
+                              >
+                                {acfg.emoji} {a}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      <div className="quick-edit-actions" style={{ marginTop: '12px' }}>
                         <button onClick={() => handleSave(quest.id)} className="save-desc-btn">Salvar</button>
                         <button onClick={handleCancelEdit} className="cancel-desc-btn">Cancelar</button>
                       </div>
