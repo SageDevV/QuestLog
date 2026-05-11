@@ -9,6 +9,9 @@ export type QuestTag = '💪 Saúde' | '📚 Estudo' | '💼 Trabalho' | '🎮 L
 
 export type QuestAgent = 'Claude' | 'Codex' | 'Gemini' | 'Kiro' | 'Manual';
 
+// Maverick Hunter — Autonomous execution status tracking
+export type MaverickStatus = 'pending' | 'queued' | 'running' | 'completed' | 'failed';
+
 export const AGENT_CONFIG: Record<QuestAgent, { emoji: string; color: string; bg: string }> = {
   Claude: { emoji: '🟠', color: '#f97316', bg: 'rgba(249,115,22,0.15)' },
   Codex:  { emoji: '🟢', color: '#22c55e', bg: 'rgba(34,197,94,0.15)' },
@@ -30,6 +33,14 @@ export interface Quest {
   scheduledDate: number;
   recurrenceType?: RecurrenceType;
   progress?: number;
+  // Maverick Hunter — Autonomous execution metadata
+  maverickStatus?: MaverickStatus;
+  maverickStartedAt?: number;
+  maverickCompletedAt?: number;
+  maverickBranch?: string;
+  maverickProject?: string;
+  maverickLog?: string;
+  maverickError?: string;
 }
 
 export interface Hero {
