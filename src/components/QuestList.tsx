@@ -124,7 +124,7 @@ export default function QuestList({ quests, highlightHard }: Props) {
                   <div style={{marginTop:'10px'}}>
                     <span style={{fontSize:'0.8rem', color:'var(--text-dim)', display:'block', marginBottom:'6px'}}>🤖 Executado por:</span>
                     <div style={{display:'flex', gap:'5px', flexWrap:'wrap'}}>
-                      {(['Claude','Codex','Gemini','Kiro','Manual'] as QuestAgent[]).map(a => {
+                      {(['Claude','Codex','Gemini','Kiro','Gamma','Manual'] as QuestAgent[]).map(a => {
                         const acfg = AGENT_CONFIG[a];
                         const isSel = tempAgent === a;
                         return <button key={a} type="button" onClick={() => setTempAgent(isSel ? undefined : a)} style={{padding:'4px 10px', background: isSel ? acfg.bg : 'rgba(255,255,255,0.04)', color: isSel ? acfg.color : 'var(--text-dim)', border: `1px solid ${isSel ? acfg.color : 'rgba(255,255,255,0.08)'}`, borderRadius:'16px', cursor:'pointer', fontSize:'0.75rem', fontWeight: isSel ? 600 : 400, transition:'all 0.2s'}}>{acfg.emoji} {a}</button>;

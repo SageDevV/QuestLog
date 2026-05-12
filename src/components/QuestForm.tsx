@@ -6,7 +6,7 @@ import { useStore } from '../store';
 const WEEKDAY_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 const RECURRENCE_OPTIONS: { type: RecurrenceType; label: string }[] = [ { type: 'single', label: 'Única' }, { type: 'daily', label: 'Diária' }, { type: 'weekly', label: 'Semanal' } ];
 const TAGS: QuestTag[] = ['💪 Saúde' , '📚 Estudo' , '💼 Trabalho' , '🎮 Lazer' , '🧙 Magia' , '🗡️ Combate' , '🌎 Explorar'];
-const AGENTS: QuestAgent[] = ['Claude', 'Codex', 'Gemini', 'Kiro', 'Manual'];
+const AGENTS: QuestAgent[] = ['Claude', 'Codex', 'Gemini', 'Kiro', 'Gamma', 'Manual'];
 
 export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Quest, onCancel?: () => void }) {
   const addQuest = useStore(s => s.addQuest);

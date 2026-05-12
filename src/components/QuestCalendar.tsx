@@ -11,7 +11,7 @@ interface QuestCalendarProps {
 }
 
 const DAY_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-const AGENTS: QuestAgent[] = ['Claude', 'Codex', 'Gemini', 'Kiro', 'Manual'];
+const AGENTS: QuestAgent[] = ['Claude', 'Codex', 'Gemini', 'Kiro', 'Gamma', 'Manual'];
 
 export default function QuestCalendar({ quests, onComplete, onDelete, onDeleteSeries, onUpdate }: QuestCalendarProps) {
   const now = new Date();
