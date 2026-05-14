@@ -5,7 +5,7 @@ import { Quest, Hero, DIFFICULTY_CONFIG, getTitle } from './types';
 // Default initial state
 const defaultHero = (): Hero => ({
   name: 'X', level: 1, xp: 0, xpToNext: 100, gold: 0, 
-  questsCompleted: 0, title: '🔋 Rookie', inventory: [], bgUnlocked: []
+  questsCompleted: 0, title: '🔋 Rookie'
 });
 
 interface AppState {
@@ -26,7 +26,6 @@ interface AppState {
   clearLevelUpMsg: () => void;
   dayClearMsg: string;
   clearDayClearMsg: () => void;
-  buyShopItem: (cost: number, itemName: string, isBg?: boolean) => boolean;
   undoToastQuestId: string | null;
   setUndoToastQuestId: (id: string | null) => void;
 }
@@ -93,21 +92,7 @@ export const useStore = create<AppState>()(
         });
       },
 
-      buyShopItem: (cost, itemName, isBg) => {
-        const { hero } = get();
-        if (hero.gold >= cost) {
-          set((s) => ({
-            hero: {
-              ...s.hero,
-              gold: s.hero.gold - cost,
-              inventory: isBg ? s.hero.inventory : [...s.hero.inventory, itemName],
-              bgUnlocked: isBg ? [...s.hero.bgUnlocked, itemName] : s.hero.bgUnlocked
-            }
-          }));
-          return true;
-        }
-        return false;
-      },
+
 
       completeQuestAction: (id) => {
         const state = get();

@@ -11,7 +11,6 @@ import BgMusic from './components/BgMusic';
 import ButtonClickSound from './components/ButtonClickSound';
 import QuestCalendar from './components/QuestCalendar';
 import DashboardStats from './components/DashboardStats';
-import ShopTavern from './components/ShopTavern';
 import LoginScreen from './components/LoginScreen';
 import StartJourneyScreen from './components/StartJourneyScreen';
 import WarningScreen from './components/WarningScreen';
@@ -27,7 +26,7 @@ export default function App() {
   const dayClearMsg = useStore(s => s.dayClearMsg);
   const clearDayClearMsg = useStore(s => s.clearDayClearMsg);
   
-  const [filter, setFilter] = useState<'active' | 'completed' | 'calendar' | 'dashboard' | 'shop'>('active');
+  const [filter, setFilter] = useState<'active' | 'completed' | 'calendar' | 'dashboard'>('active');
   const [dataLoaded, setDataLoaded] = useState(false);
   const [hasStartedJourney, setHasStartedJourney] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
@@ -218,9 +217,7 @@ export default function App() {
         setTimeout(() => setHighlightHardQuests(false), 3000);
       }} />}
       
-      {/* Background unlock logic check */}
-      {(hero.bgUnlocked.includes('Estilo: Crimson Ninja (Vermelho)')) && <div style={{position:'fixed', inset:0, background:'rgba(200, 0, 0, 0.15)', pointerEvents:'none', zIndex:1}} />}
-      {(hero.bgUnlocked.includes('Estilo: Matrix Hacker (Verde)')) && <div style={{position:'fixed', inset:0, background:'rgba(0, 200, 50, 0.15)', pointerEvents:'none', zIndex:1}} />}
+
 
       <div className="app" style={{ zIndex:10 }}>
         <h1 className="app-title">MissionLog</h1>
@@ -229,7 +226,7 @@ export default function App() {
         {dayClearMsg && <div className="level-up-toast day-clear">{dayClearMsg}</div>}
 
         <HeroPanel />
-        {filter !== 'shop' && filter !== 'dashboard' && <QuestForm />}
+        {filter !== 'dashboard' && <QuestForm />}
 
         <div className="filter-bar" style={{ flexWrap: 'wrap', marginBottom:'25px' }}>
           <button className={filter === 'active' ? 'active' : ''} onClick={() => setFilter('active')}>
@@ -244,13 +241,9 @@ export default function App() {
           <button className={filter === 'dashboard' ? 'active' : ''} onClick={() => setFilter('dashboard')} style={{ background: filter === 'dashboard' ? '#00e5ff' : 'rgba(0,229,255,0.1)', color: filter === 'dashboard' ? '#000': '#00e5ff', borderColor:'#00e5ff'}}>
             📊 Dashboard
           </button>
-          <button className={filter === 'shop' ? 'active' : ''} onClick={() => setFilter('shop')} style={{ background: filter === 'shop' ? '#facc15' : 'rgba(250, 204, 21, 0.1)', color: filter === 'shop' ? '#000': '#facc15', borderColor:'#facc15'}}>
-            🍻 Taverna
-          </button>
         </div>
 
         {filter === 'dashboard' && <DashboardStats />}
-        {filter === 'shop' && <ShopTavern />}
         {filter === 'calendar' && (
           <QuestCalendar 
             quests={quests} 

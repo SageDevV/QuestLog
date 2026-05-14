@@ -52,8 +52,6 @@ export interface Hero {
   gold: number;
   questsCompleted: number;
   title: string;
-  inventory: string[];
-  bgUnlocked: string[];
 }
 
 export const DIFFICULTY_CONFIG: Record<QuestDifficulty, { label: string; xp: number; gold: number; emoji: string; color: string }> = {
