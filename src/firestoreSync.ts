@@ -13,6 +13,7 @@ interface UserData {
 
 /** Load user data from Firestore into the local Zustand store */
 export async function loadUserData(uid: string, email?: string | null): Promise<void> {
+  if (!db) return;
   try {
     const docRef = doc(db, 'users', uid);
     const docSnap = await getDoc(docRef);
@@ -36,6 +37,7 @@ export async function loadUserData(uid: string, email?: string | null): Promise<
 
 /** Save current Zustand store data to Firestore */
 export async function saveUserData(uid: string, email?: string | null): Promise<void> {
+  if (!db) return;
   try {
     const { hero, quests } = useStore.getState();
     const docRef = doc(db, 'users', uid);
