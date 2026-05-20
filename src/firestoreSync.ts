@@ -11,6 +11,28 @@ interface UserData {
   quests: Quest[];
 }
 
+/**
+ * Recursively remove all `undefined` values from an object/array.
+ * Firestore does not accept `undefined` — this converts the data to a
+ * clean, JSON-safe structure before saving.
+ */
+function stripUndefined<T>(value: T): T {
+  if (value === null || value === undefined) return value;
+  if (Array.isArray(value)) {
+    return value.map(stripUndefined) as unknown as T;
+  }
+  if (typeof value === 'object' && value !== null) {
+    const clean: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) {
+      if (v !== undefined) {
+        clean[k] = stripUndefined(v);
+      }
+    }
+    return clean as T;
+  }
+  return value;
+}
+
 /** Load user data from Firestore into the local Zustand store */
 export async function loadUserData(uid: string, email?: string | null): Promise<void> {
   if (!db) return;
@@ -41,7 +63,7 @@ export async function saveUserData(uid: string, email?: string | null): Promise<
   try {
     const { hero, quests } = useStore.getState();
     const docRef = doc(db, 'users', uid);
-    const dataToSave: any = { 
+    const dataToSave: Record<string, unknown> = { 
       userName: hero.name,
       taskCount: quests.length,
       hero, 
@@ -52,7 +74,7 @@ export async function saveUserData(uid: string, email?: string | null): Promise<
       dataToSave.email = email;
     }
 
-    await setDoc(docRef, dataToSave, { merge: true });
+    await setDoc(docRef, stripUndefined(dataToSave), { merge: true });
   } catch (error) {
     console.error('Erro ao salvar dados no Firestore:', error);
   }
