@@ -42,11 +42,11 @@ export async function loadUserData(uid: string, email?: string | null): Promise<
 
     if (docSnap.exists()) {
       const data = docSnap.data() as UserData;
-      const store = useStore.getState();
-      // Replace local state with cloud data
+      const localState = useStore.getState();
+
       useStore.setState({
-        hero: data.hero ?? store.hero,
-        quests: data.quests ?? store.quests,
+        hero: data.hero ?? localState.hero,
+        quests: data.quests ?? [],
       });
     } else {
       // First login: migrate current localStorage data to Firestore

@@ -28,6 +28,7 @@ export default function App() {
   
   const [filter, setFilter] = useState<'active' | 'completed' | 'calendar' | 'dashboard'>('active');
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [storeHydrated, setStoreHydrated] = useState(false);
   const [hasStartedJourney, setHasStartedJourney] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
   const [highlightHardQuests, setHighlightHardQuests] = useState(false);
@@ -35,17 +36,30 @@ export default function App() {
 
   // Auto-save debounce ref
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingSaveRef = useRef(false);
 
-  // Load data from Firestore on login
+  // Wait for Zustand persist hydration
   useEffect(() => {
-    if (user && !dataLoaded) {
+    if (useStore.persist.hasHydrated()) {
+      setStoreHydrated(true);
+      return;
+    }
+    const unsub = useStore.persist.onFinishHydration(() => {
+      setStoreHydrated(true);
+    });
+    return () => unsub();
+  }, []);
+
+  // Load data from Firestore on login once store is hydrated
+  useEffect(() => {
+    if (user && storeHydrated && !dataLoaded) {
       loadUserData(user.uid, user.email).then(() => setDataLoaded(true));
     }
     if (!user) {
       setDataLoaded(false);
       hasSeenWarningRef.current = false;
     }
-  }, [user, dataLoaded]);
+  }, [user, storeHydrated, dataLoaded]);
 
   // Mega Man X Warning Screen Logic
   useEffect(() => {
@@ -72,15 +86,42 @@ export default function App() {
   useEffect(() => {
     if (!user || !dataLoaded) return;
 
+    pendingSaveRef.current = true;
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     saveTimeoutRef.current = setTimeout(() => {
+      pendingSaveRef.current = false;
       saveUserData(user.uid, user.email);
-    }, 2000);
+    }, 200);
 
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
   }, [quests, hero, user, dataLoaded]);
+
+  // Flush pending saves immediately when page becomes hidden or unloads
+  useEffect(() => {
+    const flushSave = () => {
+      if (pendingSaveRef.current && user) {
+        if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+        pendingSaveRef.current = false;
+        saveUserData(user.uid, user.email);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        flushSave();
+      }
+    };
+
+    window.addEventListener('beforeunload', flushSave);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('beforeunload', flushSave);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [user]);
 
   const prevQuestsCompleted = useRef(hero.questsCompleted);
   const isInitialMount = useRef(true);
