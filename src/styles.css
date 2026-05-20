@@ -333,7 +333,8 @@ body {
   border-left: 4px solid;
   border-radius: var(--radius);
   padding: 16px;
-  transition: transform 0.15s;
+  transition: transform 0.15s, box-shadow 0.2s;
+  cursor: pointer;
 }
 
 .quest-card:hover { transform: translateX(4px); }
@@ -621,6 +622,61 @@ body {
   display: flex;
   align-items: center;
   width: 100%;
+}
+
+/* ── Card Expand / Collapse ───────────────────────────────── */
+
+.quest-card.collapsed {
+  cursor: pointer;
+}
+
+.quest-card.expanded {
+  box-shadow: 0 0 16px rgba(0,229,255,0.08);
+  border-color: rgba(255,255,255,0.12);
+}
+
+.quest-card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.quest-card-title-row h3 {
+  margin-bottom: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.expand-chevron {
+  font-size: 1rem;
+  color: var(--text-dim);
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+}
+
+.expand-chevron.open {
+  transform: rotate(180deg);
+}
+
+.quest-desc-truncated {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 4px;
+  margin-bottom: 0;
+  opacity: 0.7;
+}
+
+.quest-card-expandable {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.quest-card.expanded .quest-card-expandable {
+  margin-top: 10px;
 }
 
 
