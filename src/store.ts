@@ -93,14 +93,6 @@ export const useStore = create<AppState>()(
         });
       },
 
-      setManualTagOnAllQuests: () => {
-        set((s) => ({
-          quests: s.quests.map(q => ({ ...q, agentLabel: 'Manual' }))
-        }));
-      },
-
-
-
       completeQuestAction: (id) => {
         const state = get();
         const quest = state.quests.find(q => q.id === id);
@@ -179,6 +171,13 @@ export const useStore = create<AppState>()(
 
       clearLevelUpMsg: () => set({ levelUpMsg: '' }),
       clearDayClearMsg: () => set({ dayClearMsg: '' })
+    }),
+    {
+      name: 'questlog-global-storage',
+    }
+  )
+);
+  clearDayClearMsg: () => set({ dayClearMsg: '' })
     }),
     {
       name: 'questlog-global-storage',
