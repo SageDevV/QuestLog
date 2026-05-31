@@ -93,9 +93,9 @@ export const useStore = create<AppState>()(
         });
       },
 
-      setManualTagOnCompletedQuests: () => {
+      setManualTagOnAllQuests: () => {
         set((s) => ({
-          quests: s.quests.map(q => q.completed ? { ...q, agentLabel: 'Manual' } : q)
+          quests: s.quests.map(q => ({ ...q, agentLabel: 'Manual' }))
         }));
       },
 
@@ -182,6 +182,9 @@ export const useStore = create<AppState>()(
     }),
     {
       name: 'questlog-global-storage',
+    }
+  )
+);
     }
   )
 );
