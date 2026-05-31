@@ -21,7 +21,7 @@ interface AppState {
   deleteAllMatching: (id: string) => void;
   updateQuest: (id: string, updates: Partial<Quest>) => void;
   updateAllMatching: (id: string, updates: Partial<Quest>) => void;
-  setManualTagOnCompletedQuests: () => void;
+  setManualTagOnAllQuests: () => void;
   completeQuestAction: (id: string) => { leveledUp: boolean, isAllDayDone: boolean };
   undoCompleteQuestAction: (id: string) => void;
   clearLevelUpMsg: () => void;
@@ -182,9 +182,6 @@ export const useStore = create<AppState>()(
     }),
     {
       name: 'questlog-global-storage',
-    }
-  )
-);
     }
   )
 );
