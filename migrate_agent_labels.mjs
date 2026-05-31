@@ -32,7 +32,7 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
 const db = admin.firestore();
 
 async function migrate() {
-  console.log('🔄 Iniciando migração: agentLabel = "Manual" para todas as quests...\n');
+  console.log('🔄 Iniciando migração: agentLabel = "Manual" para quests CONCLUÍDAS...\n');
   
   const snapshot = await db.collection('users').get();
   console.log(`👥 Encontrados ${snapshot.size} usuários no Firestore.\n`);
@@ -45,20 +45,22 @@ async function migrate() {
     
     let updated = 0;
     const migratedQuests = quests.map(q => {
-      if (!q.agentLabel) {
-        updated++;
-        return { ...q, agentLabel: 'Manual' };
+      if (q.completed) {
+        if (q.agentLabel !== 'Manual') {
+            updated++;
+            return { ...q, agentLabel: 'Manual' };
+        }
       }
       return q;
     });
 
     if (updated > 0) {
-      console.log(`👤 User ${userDoc.id}: ${updated}/${quests.length} quests atualizadas com agentLabel = "Manual"`);
+      console.log(`👤 User ${userDoc.id}: ${updated} quests concluídas atualizadas com agentLabel = "Manual"`);
       await userDoc.ref.update({ quests: migratedQuests });
       console.log(`  ✅ Salvo no Firestore`);
       totalUpdated += updated;
     } else {
-      console.log(`👤 User ${userDoc.id}: todas as ${quests.length} quests já possuem agentLabel`);
+      console.log(`👤 User ${userDoc.id}: nenhuma quest concluída para atualizar.`);
     }
   }
 

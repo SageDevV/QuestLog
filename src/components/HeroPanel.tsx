@@ -53,6 +53,7 @@ export default function HeroPanel() {
         <span>⚡ {hero.gold} Gold</span>
         <span>✅ {hero.questsCompleted} Missões</span>
         <button className="reset-btn" onClick={() => { if (confirm('Zerar seu progresso e golds? (Missões concluídas serão apagadas, pendentes serão mantidas)')) resetHero(); }}>Resetar Vida</button>
+        <button onClick={() => { if(confirm('Deseja realmente definir a tag "Manual" para todas as quests concluídas?')) useStore.getState().setManualTagOnCompletedQuests(); }}>Set Manual Tag</button>
       </div>
     </div>
   );
