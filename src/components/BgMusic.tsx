@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { bgPlay, bgPause, bgIsEnabled } from '../bgAudio';
+import { bgPlay, bgPause } from '../bgAudio';
 
 export default function BgMusic() {
   const [playing, setPlaying] = useState(false);

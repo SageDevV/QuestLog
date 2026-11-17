@@ -27,7 +27,6 @@ export function generateOccurrences(config: RecurrenceConfig): number[] {
 
   if (!endDate) return [];
 
-  const start = toMidnightTimestamp(startDate);
   const end = toMidnightTimestamp(endDate);
   const results: number[] = [];
   const current = new Date(startDate + 'T00:00:00');

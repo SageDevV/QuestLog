@@ -208,14 +208,13 @@ export default function App() {
     return quests.filter(q => filter === 'active' ? !q.completed : q.completed);
   }, [quests, filter]);
 
-  const { pendingQuests, todayQuests, tomorrowQuests } = useMemo(() => {
+  const { todayQuests, tomorrowQuests } = useMemo(() => {
     const todayStart = new Date(); todayStart.setHours(0,0,0,0);
     const todayTs = todayStart.getTime();
     const tomorrowTs = todayTs + 86400000;
     const dayAfterTs = tomorrowTs + 86400000;
 
     return {
-      pendingQuests: quests.filter(q => !q.completed && q.scheduledDate < todayTs),
       todayQuests: quests.filter(q => !q.completed && q.scheduledDate >= todayTs && q.scheduledDate < tomorrowTs),
       tomorrowQuests: quests.filter(q => !q.completed && q.scheduledDate >= tomorrowTs && q.scheduledDate < dayAfterTs)
     };

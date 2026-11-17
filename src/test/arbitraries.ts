@@ -59,14 +59,6 @@ export const arbitraryHero: fc.Arbitrary<Hero> = fc
 
 
 /**
- * Generates an array of quests for testing completion sequences.
- */
-export const arbitraryQuestSequence: fc.Arbitrary<Quest[]> = fc.array(arbitraryQuest, {
-  minLength: 1,
-  maxLength: 20,
-});
-
-/**
  * Generates strings composed only of whitespace characters (including empty string).
  */
 export const arbitraryWhitespace: fc.Arbitrary<string> = fc.stringOf(

@@ -99,7 +99,3 @@ export function bgResume() {
     }
   }
 }
-
-export function bgIsEnabled() {
-  return isEnabled;
-}
