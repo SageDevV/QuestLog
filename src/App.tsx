@@ -13,6 +13,7 @@ import QuestCalendar from './components/QuestCalendar';
 import DashboardStats from './components/DashboardStats';
 import LoginScreen from './components/LoginScreen';
 import StartJourneyScreen from './components/StartJourneyScreen';
+import StreakCounter from './components/StreakCounter';
 import WarningScreen from './components/WarningScreen';
 import missionClearSrc from './music_mission_clear.mp3';
 import { bgSuspend, bgResume } from './bgAudio';
@@ -250,6 +251,7 @@ export default function App() {
       <HeroScene />
       <BgMusic />
       <ButtonClickSound />
+      <StreakCounter />
       
       {showWarning && <WarningScreen onClose={() => {
         setShowWarning(false);

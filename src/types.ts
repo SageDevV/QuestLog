@@ -45,6 +45,8 @@ export interface Hero {
   gold: number;
   questsCompleted: number;
   title: string;
+  streak?: number;
+  streakLastDate?: number;
 }
 
 export const DIFFICULTY_CONFIG: Record<QuestDifficulty, { label: string; xp: number; gold: number; emoji: string; color: string }> = {

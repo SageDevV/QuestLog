@@ -16,6 +16,7 @@ interface AppState {
   // Actions
   setHeroName: (name: string) => void;
   resetHero: () => void;
+  resetStreak: () => void;
   addQuest: (q: Quest | Quest[]) => void;
   deleteQuest: (id: string) => void;
   deleteAllMatching: (id: string) => void;
@@ -47,6 +48,8 @@ export const useStore = create<AppState>()(
         quests: s.quests.filter(q => !q.completed)
       })),
       
+      resetStreak: () => set((s) => ({ hero: { ...s.hero, streak: 0, streakLastDate: undefined } })),
+
       addQuest: (questOrQuests) => {
         const arr = Array.isArray(questOrQuests) ? questOrQuests : [questOrQuests];
         set((s) => ({ quests: [...arr, ...s.quests] }));
@@ -114,6 +117,17 @@ export const useStore = create<AppState>()(
         newHero.gold += config.gold;
         newHero.questsCompleted++;
         newHero.title = getTitle(newHero.level);
+
+        const streakDay = new Date();
+        streakDay.setHours(0, 0, 0, 0);
+        const streakToday = streakDay.getTime();
+        if (newHero.streakLastDate !== streakToday) {
+          const yesterday = new Date(streakToday);
+          yesterday.setDate(yesterday.getDate() - 1);
+          const continues = newHero.streakLastDate === yesterday.getTime();
+          newHero.streak = continues ? (newHero.streak ?? 0) + 1 : 1;
+          newHero.streakLastDate = streakToday;
+        }
 
         const newQuests = state.quests.map(q => q.id === id ? { ...q, completed: true, completedAt: Date.now() } : q);
         
