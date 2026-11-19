@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import runnerGif from '../runner.gif';
 import CyberpunkCity from './CyberpunkCity';
 
@@ -15,7 +15,7 @@ function getTimeOfDay(): 'morning' | 'afternoon' | 'night' {
   return 'night';
 }
 
-export default function HeroScene() {
+function HeroScene() {
   const [timeOfDay, setTimeOfDay] = useState(getTimeOfDay);
   const [isRaining, setIsRaining] = useState(false);
 
@@ -114,3 +114,5 @@ export default function HeroScene() {
     </div>
   );
 }
+
+export default memo(HeroScene);

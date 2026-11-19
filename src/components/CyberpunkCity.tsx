@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 /**
  * CyberpunkCity — Mega Man X-style pixel art city skyline.
  * Three variants: morning, afternoon, night.
@@ -305,7 +307,7 @@ const nearLayout = [
 ];
 
 /* ── MAIN COMPONENT ─────────────────────────────────────────── */
-export default function CyberpunkCity({ timeOfDay, layer = 'near' }: CyberpunkCityProps) {
+function CyberpunkCity({ timeOfDay, layer = 'near' }: CyberpunkCityProps) {
   const pal = palettes[timeOfDay];
   const vw = 600, vh = 280;
   const ground = vh;
@@ -374,3 +376,5 @@ export default function CyberpunkCity({ timeOfDay, layer = 'near' }: CyberpunkCi
     </svg>
   );
 }
+
+export default memo(CyberpunkCity);

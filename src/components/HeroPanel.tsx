@@ -3,7 +3,9 @@ import { useStore } from '../store';
 import { useAuth } from '../AuthContext';
 
 export default function HeroPanel() {
-  const { hero, setHeroName, resetHero } = useStore();
+  const hero = useStore(s => s.hero);
+  const setHeroName = useStore(s => s.setHeroName);
+  const resetHero = useStore(s => s.resetHero);
   const { user, signOut } = useAuth();
   const [editing, setEditing] = useState(false);
   const [tempName, setTempName] = useState(hero.name);

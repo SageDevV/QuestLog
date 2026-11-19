@@ -1,23 +1,26 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
 import { useStore } from './store';
 import { useAuth } from './AuthContext';
 import { loadUserData, saveUserData } from './firestoreSync';
-import confetti from 'canvas-confetti';
 import HeroPanel from './components/HeroPanel';
 import QuestForm from './components/QuestForm';
 import QuestList from './components/QuestList';
 import HeroScene from './components/HeroScene';
 import BgMusic from './components/BgMusic';
 import ButtonClickSound from './components/ButtonClickSound';
-import QuestCalendar from './components/QuestCalendar';
-import FastingTimer from './components/FastingTimer';
-import DashboardStats from './components/DashboardStats';
+const QuestCalendar = lazy(() => import('./components/QuestCalendar'));
+const FastingTimer = lazy(() => import('./components/FastingTimer'));
+const DashboardStats = lazy(() => import('./components/DashboardStats'));
 import LoginScreen from './components/LoginScreen';
 import StartJourneyScreen from './components/StartJourneyScreen';
 import StreakCounter from './components/StreakCounter';
 import WarningScreen from './components/WarningScreen';
 import missionClearSrc from './music_mission_clear.mp3';
+import type confetti from 'canvas-confetti';
 import { bgSuspend, bgResume } from './bgAudio';
+
+const fireConfetti = (opts: confetti.Options) =>
+  import('canvas-confetti').then(m => m.default(opts));
 
 export default function App() {
   const { user, loading } = useAuth();
@@ -135,7 +138,7 @@ export default function App() {
     if (!dataLoaded) return;
 
     if (!isInitialMount.current && hero.questsCompleted > prevQuestsCompleted.current) {
-      confetti({ particleCount: 80, spread: 60, origin: { y: 0.8 }, zIndex: 10000 });
+      fireConfetti({ particleCount: 80, spread: 60, origin: { y: 0.8 }, zIndex: 10000 });
     }
     
     if (isInitialMount.current && dataLoaded) {
@@ -157,8 +160,8 @@ export default function App() {
       // Optimize confetti: fire 4 bursts instead of a heavy CPU loop
       let burstCount = 0;
       const interval = setInterval(() => {
-        confetti({ particleCount: 50, angle: 60, spread: 80, origin: { x: 0, y: 0.7 }, colors: ['#e94560', '#facc15'], zIndex: 10000 });
-        confetti({ particleCount: 50, angle: 120, spread: 80, origin: { x: 1, y: 0.7 }, colors: ['#00e5ff', '#ffffff'], zIndex: 10000 });
+        fireConfetti({ particleCount: 50, angle: 60, spread: 80, origin: { x: 0, y: 0.7 }, colors: ['#e94560', '#facc15'], zIndex: 10000 });
+        fireConfetti({ particleCount: 50, angle: 120, spread: 80, origin: { x: 1, y: 0.7 }, colors: ['#00e5ff', '#ffffff'], zIndex: 10000 });
         burstCount++;
         if (burstCount >= 4) clearInterval(interval);
       }, 500);
@@ -180,7 +183,7 @@ export default function App() {
 
       let burstCount = 0;
       const interval = setInterval(() => {
-        confetti({ particleCount: 40, angle: 90, spread: 70, origin: { x: 0.5, y: 0.7 }, colors: ['#4ade80', '#facc15'], zIndex: 10000 });
+        fireConfetti({ particleCount: 40, angle: 90, spread: 70, origin: { x: 0.5, y: 0.7 }, colors: ['#4ade80', '#facc15'], zIndex: 10000 });
         burstCount++;
         if (burstCount >= 3) clearInterval(interval);
       }, 600);
@@ -291,6 +294,7 @@ export default function App() {
           </button>
         </div>
 
+        <Suspense fallback={<div className="empty-msg">Carregando...</div>}>
         {filter === 'dashboard' && <DashboardStats />}
         {filter === 'fasting' && <FastingTimer />}
         {filter === 'calendar' && (
@@ -302,6 +306,7 @@ export default function App() {
             onUpdate={useStore.getState().updateQuest}
           />
         )}
+        </Suspense>
 
         {filter === 'active' && (
           <>
