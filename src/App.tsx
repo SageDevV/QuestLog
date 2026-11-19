@@ -268,7 +268,16 @@ export default function App() {
 
 
       <div className="app" style={{ zIndex:10 }}>
-        <h1 className="app-title">MissionLog</h1>
+        <header className="app-header">
+          <div className="app-brand">
+            <span className="app-brand-icon" aria-hidden="true">✦</span>
+            <div>
+              <p className="app-eyebrow">Seu centro de comando</p>
+              <h1 className="app-title">MissionLog</h1>
+            </div>
+          </div>
+          <span className="app-status"><span aria-hidden="true" /> Jornada em andamento</span>
+        </header>
 
         {levelUpMsg && <div className="level-up-toast">{levelUpMsg}</div>}
         {dayClearMsg && <div className="level-up-toast day-clear">{dayClearMsg}</div>}
@@ -276,26 +285,26 @@ export default function App() {
         <HeroPanel />
         {filter !== 'dashboard' && filter !== 'fasting' && filter !== 'nofap' && <QuestForm />}
 
-        <div className="filter-bar" style={{ flexWrap: 'wrap', marginBottom:'25px' }}>
-          <button className={filter === 'active' ? 'active' : ''} onClick={() => setFilter('active')}>
+        <nav className="filter-bar" aria-label="Seções da jornada">
+          <button className={filter === 'active' ? 'active' : ''} aria-pressed={filter === 'active'} onClick={() => setFilter('active')}>
             📋 Ativas ({quests.filter(q => !q.completed).length})
           </button>
-          <button className={filter === 'completed' ? 'active' : ''} onClick={() => setFilter('completed')}>
+          <button className={filter === 'completed' ? 'active' : ''} aria-pressed={filter === 'completed'} onClick={() => setFilter('completed')}>
             ✅ Completas
           </button>
-          <button className={filter === 'calendar' ? 'active' : ''} onClick={() => setFilter('calendar')}>
+          <button className={filter === 'calendar' ? 'active' : ''} aria-pressed={filter === 'calendar'} onClick={() => setFilter('calendar')}>
             📅 Calendário
           </button>
-          <button className={`dashboard-tab${filter === 'dashboard' ? ' active' : ''}`} onClick={() => setFilter('dashboard')}>
+          <button className={`dashboard-tab${filter === 'dashboard' ? ' active' : ''}`} aria-pressed={filter === 'dashboard'} onClick={() => setFilter('dashboard')}>
             📊 Dashboard
           </button>
-          <button className={filter === 'fasting' ? 'active' : ''} onClick={() => setFilter('fasting')}>
+          <button className={filter === 'fasting' ? 'active' : ''} aria-pressed={filter === 'fasting'} onClick={() => setFilter('fasting')}>
             ⏱️ Jejum{activeFast ? ' •' : ''}
           </button>
-          <button className={filter === 'nofap' ? 'active' : ''} onClick={() => setFilter('nofap')}>
+          <button className={filter === 'nofap' ? 'active' : ''} aria-pressed={filter === 'nofap'} onClick={() => setFilter('nofap')}>
             🚫 No fap{noFap ? ' •' : ''}
           </button>
-        </div>
+        </nav>
 
         <Suspense fallback={<div className="empty-msg">Carregando...</div>}>
         {filter === 'dashboard' && <DashboardStats />}

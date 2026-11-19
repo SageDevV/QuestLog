@@ -53,7 +53,7 @@ export default function QuestList({ quests, highlightHard }: Props) {
             className={`quest-card ${quest.completed ? 'completed' : ''} ${shouldHighlight ? 'highlight-danger' : ''}`} 
             style={{ 
               borderLeftColor: cfg.color,
-              background: quest.completed ? undefined : `linear-gradient(90deg, rgba(74, 222, 128, 0.3) ${quest.progress || 0}%, rgba(15, 20, 40, 0.9) ${quest.progress || 0}%)`,
+              background: quest.completed ? undefined : `linear-gradient(90deg, rgba(34, 228, 255, 0.13) ${quest.progress || 0}%, rgba(10, 17, 35, 0.94) ${quest.progress || 0}%)`,
               position: 'relative',
               overflow: 'hidden'
             }}

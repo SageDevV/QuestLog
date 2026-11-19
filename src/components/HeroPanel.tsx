@@ -32,6 +32,7 @@ export default function HeroPanel() {
         </div>
       )}
 
+      <p className="hero-kicker">Perfil do herói <span aria-hidden="true"> / / </span> Progresso</p>
       <div className="hero-header">
         {editing ? (
           <div className="hero-edit">
@@ -46,6 +47,7 @@ export default function HeroPanel() {
         <span className="hero-level">Nível {hero.level}</span>
       </div>
 
+      <div className="xp-caption"><span>Experiência</span><span>Próximo nível</span></div>
       <div className="xp-bar-container">
         <div className="xp-bar" style={{ width: `${barWidth}%` }} />
         <span className="xp-label">{hero.xp} / {hero.xpToNext} XP</span>
