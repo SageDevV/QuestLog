@@ -115,7 +115,7 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
       </div>
       
       <div className="form-actions" style={{marginTop:'10px'}}>
-        <button type="submit" className="submit-btn" style={{background:'#e94560'}}>
+        <button type="submit" className="submit-btn">
           {initialQuest ? '💾 Salvar Alterações' : '🏹 Declarar Missão'}
         </button>
         <button type="button" className="cancel-btn" onClick={handleCancel}>Recuar</button>

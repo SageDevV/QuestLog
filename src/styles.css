@@ -1,19 +1,20 @@
 :root {
-  --bg: #1a1a2e;
-  --surface: #16213e;
-  --surface2: #0f3460;
-  --accent: #e94560;
-  --gold: #00e5ff;
-  --text: #eee;
-  --text-dim: #8892b0;
-  --radius: 10px;
+  --bg: #070b18;
+  --surface: #0d1428;
+  --surface2: #14204a;
+  --accent: #ff3d81;
+  --gold: #22e4ff;
+  --violet: #8b5cf6;
+  --text: #e8f0ff;
+  --text-dim: #8b9ac4;
+  --radius: 14px;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: 'Inter', sans-serif;
-  background: #0a0a15;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  background: #05070f;
   color: var(--text);
   min-height: 100vh;
 }

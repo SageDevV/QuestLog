@@ -30,8 +30,8 @@ export default function StartJourneyScreen({ onStart }: { onStart: () => void })
           onClick={handleStartClick} 
           style={{ 
             marginTop: '20px', 
-            background: '#e94560', 
-            color: 'white', 
+            background: 'linear-gradient(135deg, #22e4ff, #8b5cf6 55%, #ff3d81)', 
+            color: '#05070f', 
             border: 'none',
             justifyContent: 'center',
             fontWeight: 'bold',

@@ -205,8 +205,8 @@ export default function FastingTimer() {
           <svg viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`} aria-hidden="true">
             <defs>
               <linearGradient id="fast-grad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#00e5ff" />
-                <stop offset="100%" stopColor="#e94560" />
+                <stop offset="0%" stopColor="#22e4ff" />
+                <stop offset="100%" stopColor="#8b5cf6" />
               </linearGradient>
               <linearGradient id="fast-grad-done" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor="#10b981" />

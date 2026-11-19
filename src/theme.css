@@ -1,0 +1,520 @@
+/* ===== Futuristic theme layer (loaded after styles.css) ===== */
+:root {
+  --glass: rgba(12, 18, 40, 0.62);
+  --glass-strong: rgba(10, 15, 34, 0.82);
+  --glass-border: rgba(120, 160, 255, 0.16);
+  --glow-cyan: 0 0 18px rgba(34, 228, 255, 0.35);
+  --glow-violet: 0 0 18px rgba(139, 92, 246, 0.4);
+  --grad-primary: linear-gradient(135deg, #22e4ff 0%, #8b5cf6 55%, #ff3d81 100%);
+  --grad-surface: linear-gradient(160deg, rgba(34, 228, 255, 0.06), rgba(139, 92, 246, 0.05) 60%, rgba(255, 61, 129, 0.04));
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  -webkit-font-smoothing: antialiased;
+  background:
+    radial-gradient(1200px 600px at 15% -10%, rgba(139, 92, 246, 0.18), transparent 60%),
+    radial-gradient(900px 500px at 95% 10%, rgba(34, 228, 255, 0.14), transparent 60%),
+    #05070f;
+  background-attachment: fixed;
+}
+
+/* Subtle holographic grid + scanlines over the whole app */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(34, 228, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 228, 255, 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at 50% 30%, #000 0%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 30%, #000 0%, transparent 75%);
+}
+
+::selection { background: rgba(34, 228, 255, 0.3); color: #fff; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #05070f; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #22e4ff55, #8b5cf655);
+  border-radius: 10px;
+  border: 2px solid #05070f;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ===== Layout / Title ===== */
+.app { max-width: 720px; padding-top: 32px; }
+
+.app-title {
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  background: var(--grad-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 0 18px rgba(34, 228, 255, 0.35));
+  position: relative;
+  padding-bottom: 14px;
+}
+
+.app-title::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 120px;
+  height: 2px;
+  transform: translateX(-50%);
+  background: var(--grad-primary);
+  border-radius: 2px;
+  box-shadow: var(--glow-cyan);
+}
+
+/* ===== Glass surfaces ===== */
+.hero-panel,
+.quest-form,
+.quest-card,
+.quest-calendar,
+.day-panel,
+.fasting-card,
+.fasting-meta-card,
+.fasting-phase,
+.fasting-history li,
+.nofap-counter,
+.new-quest-btn,
+.login-card,
+.undo-toast,
+.music-toggle {
+  background: var(--grad-surface), var(--glass);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.hero-panel,
+.quest-form,
+.quest-calendar,
+.fasting-card,
+.nofap-counter {
+  border-radius: 18px;
+}
+
+.hero-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+/* neon hairline on top of main panels */
+.hero-panel::before,
+.quest-calendar::before,
+.fasting-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--violet), transparent);
+  opacity: 0.8;
+  pointer-events: none;
+}
+.quest-calendar, .fasting-card { position: relative; }
+
+/* ===== Hero panel ===== */
+.hero-header h2 { letter-spacing: 0.06em; }
+.hero-title { color: var(--gold); text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.7rem; }
+
+.hero-level {
+  background: var(--grad-primary);
+  color: #fff;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.72rem;
+  box-shadow: var(--glow-violet);
+}
+
+.xp-bar-container {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(120, 160, 255, 0.18);
+  height: 24px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.xp-bar {
+  background: linear-gradient(90deg, #22e4ff, #8b5cf6 60%, #ff3d81);
+  box-shadow: 0 0 16px rgba(34, 228, 255, 0.55);
+  position: relative;
+  overflow: hidden;
+}
+
+.xp-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: xp-shine 3s ease-in-out infinite;
+}
+
+@keyframes xp-shine {
+  to { transform: translateX(100%); }
+}
+
+.xp-label { text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8); letter-spacing: 0.06em; }
+
+.hero-edit input,
+.quest-form input,
+.quest-form textarea,
+.fasting input[type="datetime-local"],
+.fasting input[type="number"],
+.date-range-row input[type="date"],
+.calendar-quick-edit input,
+.calendar-quick-edit textarea {
+  background: rgba(5, 8, 20, 0.7);
+  border: 1px solid var(--glass-border);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.hero-edit input:focus,
+.quest-form input:focus,
+.quest-form textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(34, 228, 255, 0.15), var(--glow-cyan);
+}
+
+.user-bar { border-bottom: 1px solid var(--glass-border); }
+.user-avatar { box-shadow: 0 0 0 2px var(--gold), var(--glow-cyan); }
+
+/* ===== Buttons ===== */
+.submit-btn,
+.fasting-btn.primary,
+.hero-edit button {
+  background: var(--grad-primary);
+  background-size: 160% 160%;
+  color: #05070f;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: none;
+  box-shadow: 0 6px 22px rgba(139, 92, 246, 0.35);
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s, background-position 0.4s;
+}
+
+.submit-btn:hover,
+.fasting-btn.primary:hover,
+.hero-edit button:hover {
+  opacity: 1;
+  background-position: 100% 0;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(34, 228, 255, 0.35);
+}
+
+.submit-btn:active { transform: translateY(0); }
+
+.cancel-btn,
+.reset-btn,
+.logout-btn,
+.edit-btn,
+.delete-btn,
+.complete-btn,
+.fasting-btn,
+.fasting-chip,
+.recurrence-btn,
+.weekday-btn,
+.pagination button,
+.recurrence-filter-bar button,
+.calendar-header button {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.2s var(--ease-out);
+}
+
+.cancel-btn:hover,
+.fasting-btn:hover,
+.fasting-chip:hover,
+.recurrence-btn:hover:not(.selected),
+.weekday-btn:hover:not(.selected) {
+  border-color: var(--gold);
+  color: var(--gold);
+  box-shadow: var(--glow-cyan);
+}
+
+.complete-btn {
+  background: rgba(34, 228, 255, 0.1);
+  border-color: rgba(34, 228, 255, 0.45);
+  color: var(--gold);
+}
+.complete-btn:hover { background: rgba(34, 228, 255, 0.22); box-shadow: var(--glow-cyan); }
+
+.delete-btn:hover { box-shadow: 0 0 16px rgba(255, 61, 129, 0.35); }
+
+.new-quest-btn {
+  border: 1px dashed rgba(34, 228, 255, 0.35);
+  color: var(--gold);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  border-radius: 16px;
+  transition: all 0.25s var(--ease-out);
+}
+.new-quest-btn:hover {
+  border-color: var(--gold);
+  color: #fff;
+  box-shadow: var(--glow-cyan), inset 0 0 24px rgba(34, 228, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.recurrence-btn.selected,
+.weekday-btn.selected,
+.fasting-chip.selected,
+.agent-label-btn.selected {
+  background: rgba(34, 228, 255, 0.14);
+  border-color: var(--gold);
+  color: var(--gold);
+  box-shadow: var(--glow-cyan);
+}
+
+.diff-btn {
+  background: rgba(5, 8, 20, 0.6);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+}
+.diff-btn:hover { border-color: rgba(34, 228, 255, 0.5); transform: translateY(-2px); }
+.diff-btn.selected { background: rgba(34, 228, 255, 0.08); box-shadow: var(--glow-cyan); }
+
+/* ===== Filter bar (segmented pill nav) ===== */
+.filter-bar {
+  gap: 6px;
+  padding: 6px;
+  background: var(--glass-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.filter-bar button {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  min-width: 110px;
+  transition: all 0.25s var(--ease-out);
+}
+
+.filter-bar button:hover { color: var(--text); background: rgba(255, 255, 255, 0.05); }
+
+.filter-bar button.active {
+  background: linear-gradient(135deg, rgba(34, 228, 255, 0.2), rgba(139, 92, 246, 0.25));
+  border-color: rgba(34, 228, 255, 0.55);
+  color: #fff;
+  box-shadow: var(--glow-cyan), inset 0 0 14px rgba(139, 92, 246, 0.2);
+}
+
+.filter-bar button.dashboard-tab { color: var(--gold); }
+.filter-bar button.dashboard-tab.active { color: #fff; }
+
+/* ===== Quest cards ===== */
+.quest-card {
+  border-radius: 14px;
+  border-left-width: 3px;
+  transition: transform 0.25s var(--ease-out), box-shadow 0.25s, border-color 0.25s;
+}
+
+.quest-card:hover {
+  transform: translateY(-2px) translateX(3px);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45), 0 0 24px rgba(34, 228, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.quest-card h3 { letter-spacing: 0.01em; }
+.quest-reward { text-shadow: 0 0 10px rgba(34, 228, 255, 0.5); font-weight: 600; }
+
+.quest-card.editing { background: var(--glass-strong); border-style: dashed; }
+
+.quest-progress-badge,
+.agent-badge {
+  border-radius: 999px;
+}
+
+.progress-slider::-webkit-slider-thumb {
+  box-shadow: var(--glow-cyan);
+}
+
+.day-section-title {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+}
+
+.empty-msg { opacity: 0.85; }
+
+/* ===== Toasts ===== */
+.level-up-toast {
+  background: linear-gradient(135deg, rgba(34, 228, 255, 0.16), rgba(139, 92, 246, 0.22));
+  border: 1px solid rgba(34, 228, 255, 0.6);
+  border-radius: 14px;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  letter-spacing: 0.04em;
+  box-shadow: var(--glow-cyan), 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.level-up-toast.day-clear {
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.16), rgba(34, 228, 255, 0.14));
+  border-color: rgba(74, 222, 128, 0.6);
+}
+
+.undo-toast { border-radius: 14px; }
+
+/* ===== Calendar ===== */
+.calendar-day {
+  border-radius: 10px;
+  transition: all 0.2s var(--ease-out);
+}
+.calendar-day:not(.empty):hover {
+  box-shadow: var(--glow-cyan);
+  border-color: rgba(34, 228, 255, 0.6);
+  transform: translateY(-1px);
+}
+.calendar-day.selected {
+  border-color: var(--gold);
+  background: rgba(34, 228, 255, 0.12);
+  box-shadow: var(--glow-cyan);
+}
+.calendar-header h2 { letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ===== Fasting / NoFap ===== */
+.fasting-ring-progress { filter: drop-shadow(0 0 6px rgba(34, 228, 255, 0.6)); }
+.fasting-elapsed,
+.nofap-days {
+  background: var(--grad-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 14px rgba(34, 228, 255, 0.35));
+}
+.fasting-phase.current {
+  box-shadow: var(--glow-cyan);
+}
+.fasting-btn.primary { color: #05070f; }
+
+/* ===== Login / Start screens ===== */
+.login-screen {
+  background:
+    radial-gradient(800px 500px at 20% 10%, rgba(139, 92, 246, 0.3), transparent 60%),
+    radial-gradient(700px 500px at 85% 85%, rgba(34, 228, 255, 0.22), transparent 60%),
+    #05070f;
+}
+
+.login-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(34, 228, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 228, 255, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at center, #000 0%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.login-particle {
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold);
+}
+
+.login-card {
+  position: relative;
+  border-radius: 24px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba(139, 92, 246, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.login-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--grad-primary);
+  opacity: 0.55;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  pointer-events: none;
+}
+
+.login-logo-icon { filter: drop-shadow(0 0 16px rgba(34, 228, 255, 0.7)); }
+
+.login-title {
+  background: var(--grad-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 0.08em;
+}
+
+.google-login-btn {
+  border-radius: 12px;
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s;
+}
+.google-login-btn:hover { box-shadow: var(--glow-cyan), 0 10px 30px rgba(0, 0, 0, 0.4); }
+
+/* ===== Music toggle ===== */
+.music-toggle {
+  color: var(--gold);
+  border-color: rgba(34, 228, 255, 0.35);
+  box-shadow: var(--glow-cyan);
+}
+.music-toggle:hover {
+  background: rgba(34, 228, 255, 0.18);
+  border-color: var(--gold);
+}
+
+/* ===== Entrance animation ===== */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.app > .hero-panel,
+.app > .filter-bar,
+.app > .day-section,
+.app > .quest-calendar,
+.app > .fasting,
+.app > .nofap-counter,
+.quest-list > .quest-card {
+  animation: rise-in 0.5s var(--ease-out) both;
+}
+
+.quest-list > .quest-card:nth-child(2) { animation-delay: 0.05s; }
+.quest-list > .quest-card:nth-child(3) { animation-delay: 0.1s; }
+.quest-list > .quest-card:nth-child(4) { animation-delay: 0.15s; }
+.quest-list > .quest-card:nth-child(n+5) { animation-delay: 0.2s; }
+
+@media (max-width: 560px) {
+  .app { padding-left: 12px; padding-right: 12px; }
+  .app-title { font-size: 1.8rem; letter-spacing: 0.14em; }
+  .filter-bar button { min-width: 0; flex: 1 1 30%; font-size: 0.8rem; padding: 9px 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-bar::after { animation: none; }
+  .app > *, .quest-list > .quest-card { animation: none !important; }
+}

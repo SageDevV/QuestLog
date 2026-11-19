@@ -286,7 +286,7 @@ export default function App() {
           <button className={filter === 'calendar' ? 'active' : ''} onClick={() => setFilter('calendar')}>
             📅 Calendário
           </button>
-          <button className={filter === 'dashboard' ? 'active' : ''} onClick={() => setFilter('dashboard')} style={{ background: filter === 'dashboard' ? '#00e5ff' : 'rgba(0,229,255,0.1)', color: filter === 'dashboard' ? '#000': '#00e5ff', borderColor:'#00e5ff'}}>
+          <button className={`dashboard-tab${filter === 'dashboard' ? ' active' : ''}`} onClick={() => setFilter('dashboard')}>
             📊 Dashboard
           </button>
           <button className={filter === 'fasting' ? 'active' : ''} onClick={() => setFilter('fasting')}>
