@@ -10,10 +10,10 @@ import BgMusic from './components/BgMusic';
 import ButtonClickSound from './components/ButtonClickSound';
 const QuestCalendar = lazy(() => import('./components/QuestCalendar'));
 const FastingTimer = lazy(() => import('./components/FastingTimer'));
+const NoFapCounter = lazy(() => import('./components/NoFapCounter'));
 const DashboardStats = lazy(() => import('./components/DashboardStats'));
 import LoginScreen from './components/LoginScreen';
 import StartJourneyScreen from './components/StartJourneyScreen';
-import StreakCounter from './components/StreakCounter';
 import WarningScreen from './components/WarningScreen';
 import missionClearSrc from './music_mission_clear.mp3';
 import type confetti from 'canvas-confetti';
@@ -28,12 +28,13 @@ export default function App() {
   const hero = useStore(s => s.hero);
   const activeFast = useStore(s => s.activeFast);
   const fastHistory = useStore(s => s.fastHistory);
+  const noFap = useStore(s => s.noFap);
   const levelUpMsg = useStore(s => s.levelUpMsg);
   const clearLevelUpMsg = useStore(s => s.clearLevelUpMsg);
   const dayClearMsg = useStore(s => s.dayClearMsg);
   const clearDayClearMsg = useStore(s => s.clearDayClearMsg);
   
-  const [filter, setFilter] = useState<'active' | 'completed' | 'calendar' | 'dashboard' | 'fasting'>('active');
+  const [filter, setFilter] = useState<'active' | 'completed' | 'calendar' | 'dashboard' | 'fasting' | 'nofap'>('active');
   const [dataLoaded, setDataLoaded] = useState(false);
   const [storeHydrated, setStoreHydrated] = useState(false);
   const [hasStartedJourney, setHasStartedJourney] = useState(false);
@@ -103,7 +104,7 @@ export default function App() {
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
-  }, [quests, hero, activeFast, fastHistory, user, dataLoaded]);
+  }, [quests, hero, activeFast, fastHistory, noFap, user, dataLoaded]);
 
   // Flush pending saves immediately when page becomes hidden or unloads
   useEffect(() => {
@@ -257,7 +258,6 @@ export default function App() {
       <HeroScene />
       <BgMusic />
       <ButtonClickSound />
-      <StreakCounter />
       
       {showWarning && <WarningScreen onClose={() => {
         setShowWarning(false);
@@ -274,7 +274,7 @@ export default function App() {
         {dayClearMsg && <div className="level-up-toast day-clear">{dayClearMsg}</div>}
 
         <HeroPanel />
-        {filter !== 'dashboard' && filter !== 'fasting' && <QuestForm />}
+        {filter !== 'dashboard' && filter !== 'fasting' && filter !== 'nofap' && <QuestForm />}
 
         <div className="filter-bar" style={{ flexWrap: 'wrap', marginBottom:'25px' }}>
           <button className={filter === 'active' ? 'active' : ''} onClick={() => setFilter('active')}>
@@ -292,11 +292,15 @@ export default function App() {
           <button className={filter === 'fasting' ? 'active' : ''} onClick={() => setFilter('fasting')}>
             ⏱️ Jejum{activeFast ? ' •' : ''}
           </button>
+          <button className={filter === 'nofap' ? 'active' : ''} onClick={() => setFilter('nofap')}>
+            🚫 No fap{noFap ? ' •' : ''}
+          </button>
         </div>
 
         <Suspense fallback={<div className="empty-msg">Carregando...</div>}>
         {filter === 'dashboard' && <DashboardStats />}
         {filter === 'fasting' && <FastingTimer />}
+        {filter === 'nofap' && <NoFapCounter />}
         {filter === 'calendar' && (
           <QuestCalendar 
             quests={quests} 

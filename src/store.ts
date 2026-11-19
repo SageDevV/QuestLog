@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Quest, Hero, ActiveFast, FastRecord, DIFFICULTY_CONFIG, getTitle } from './types';
+import { Quest, Hero, ActiveFast, FastRecord, NoFapState, DIFFICULTY_CONFIG, getTitle } from './types';
 import { MAX_HISTORY } from './fastingUtils';
+import { getNoFapDays } from './noFapUtils';
 
 // Default initial state
 const defaultHero = (): Hero => ({
@@ -15,14 +16,17 @@ interface AppState {
   levelUpMsg: string;
   activeFast: ActiveFast | null;
   fastHistory: FastRecord[];
+  noFap: NoFapState | null;
 
   // Actions
+  startNoFap: () => void;
+  restartNoFap: () => void;
+  setNoFapStart: (startedAt: number) => void;
   startFast: (protocolId: string, targetHours: number) => void;
   updateFast: (updates: Partial<ActiveFast>) => void;
   endFast: () => void;
   setHeroName: (name: string) => void;
   resetHero: () => void;
-  resetStreak: () => void;
   addQuest: (q: Quest | Quest[]) => void;
   deleteQuest: (id: string) => void;
   deleteAllMatching: (id: string) => void;
@@ -45,6 +49,7 @@ export const useStore = create<AppState>()(
       levelUpMsg: '',
       activeFast: null,
       fastHistory: [],
+      noFap: null,
       dayClearMsg: '',
       undoToastQuestId: null,
 
@@ -62,6 +67,20 @@ export const useStore = create<AppState>()(
         return { activeFast: null, fastHistory: [record, ...s.fastHistory].slice(0, MAX_HISTORY) };
       }),
 
+      startNoFap: () => set((s) =>
+        s.noFap ? s : { noFap: { startedAt: Date.now(), bestDays: 0 } }
+      ),
+
+      restartNoFap: () => set((s) => {
+        if (!s.noFap) return s;
+        const bestDays = Math.max(s.noFap.bestDays, getNoFapDays(s.noFap.startedAt, Date.now()));
+        return { noFap: { startedAt: Date.now(), bestDays } };
+      }),
+
+      setNoFapStart: (startedAt) => set((s) =>
+        s.noFap ? { noFap: { ...s.noFap, startedAt } } : s
+      ),
+
       setUndoToastQuestId: (id) => set({ undoToastQuestId: id }),
 
       setHeroName: (name) => set((s) => ({ hero: { ...s.hero, name } })),
@@ -70,8 +89,6 @@ export const useStore = create<AppState>()(
         quests: s.quests.filter(q => !q.completed)
       })),
       
-      resetStreak: () => set((s) => ({ hero: { ...s.hero, streak: 0, streakLastDate: undefined } })),
-
       addQuest: (questOrQuests) => {
         const arr = Array.isArray(questOrQuests) ? questOrQuests : [questOrQuests];
         set((s) => ({ quests: [...arr, ...s.quests] }));

@@ -55,6 +55,11 @@ export interface ActiveFast {
   protocolId: string;
 }
 
+export interface NoFapState {
+  startedAt: number;
+  bestDays: number;
+}
+
 export interface FastRecord {
   id: string;
   startedAt: number;

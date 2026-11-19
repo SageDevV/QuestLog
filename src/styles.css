@@ -1159,56 +1159,6 @@ body {
   transform: scale(1.1);
 }
 
-/* Streak counter */
-.streak-counter {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px 6px 14px;
-  border-radius: 999px;
-  background: rgba(22, 33, 62, 0.9);
-  border: 1px solid rgba(255,255,255,0.15);
-  color: var(--text);
-  font-weight: 700;
-}
-
-.streak-counter.active {
-  border-color: #fb923c;
-  box-shadow: 0 0 12px rgba(251, 146, 60, 0.4);
-}
-
-.streak-counter .streak-fire {
-  font-size: 1.3rem;
-  filter: grayscale(1);
-  opacity: 0.6;
-}
-
-.streak-counter.active .streak-fire {
-  filter: none;
-  opacity: 1;
-}
-
-.streak-counter .streak-reset {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: transparent;
-  color: var(--text);
-  cursor: pointer;
-  font-size: 0.9rem;
-  line-height: 1;
-}
-
-.streak-counter .streak-reset:hover {
-  background: rgba(233, 69, 96, 0.3);
-  border-color: var(--accent);
-}
-
 /* ===== Quest Calendar ===== */
 .quest-calendar {
   background: rgba(22, 33, 62, 0.85);
@@ -2276,6 +2226,25 @@ body {
   padding: 6px 0;
   border-top: 1px solid rgba(255,255,255,0.06);
 }
+
+/* No fap counter */
+.nofap-counter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 0 16px;
+}
+
+.nofap-days {
+  font-family: 'Orbitron', monospace;
+  font-size: 5rem;
+  line-height: 1;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.nofap-unit { color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.85rem; }
+.nofap-center { text-align: center; }
 
 @media (max-width: 480px) {
   .fasting-meta { grid-template-columns: 1fr; }
