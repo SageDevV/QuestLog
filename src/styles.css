@@ -2050,3 +2050,239 @@ body {
 }
 
 
+
+/* ===== Fasting ===== */
+.fasting { display: flex; flex-direction: column; gap: 16px; }
+
+.fasting-card {
+  background: rgba(22, 33, 62, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: border-color 0.4s, box-shadow 0.4s;
+}
+
+.fasting-card.reached {
+  border-color: #10b981;
+  box-shadow: 0 0 18px rgba(16, 185, 129, 0.25);
+}
+
+.fasting-title {
+  font-family: 'Orbitron', cursive;
+  text-align: center;
+  color: var(--gold);
+  font-size: 1.2rem;
+  margin-bottom: 16px;
+}
+
+.fasting-subtitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 1rem;
+  margin-bottom: 12px;
+}
+
+.fasting-hint { color: var(--text-dim); font-size: 0.8rem; }
+.fasting-window { text-align: center; margin: 10px 0 4px; }
+
+.fasting-protocols { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+.fasting-chip {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(15, 52, 96, 0.4);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.fasting-chip:hover { border-color: var(--gold); color: var(--text); }
+
+.fasting-chip.selected {
+  background: var(--surface2);
+  border-color: var(--gold);
+  color: var(--text);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.25);
+}
+
+.fasting-custom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.fasting input[type="number"],
+.fasting input[type="datetime-local"] {
+  background: rgba(10, 10, 21, 0.6);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  color-scheme: dark;
+}
+
+.fasting input[type="number"] { width: 80px; }
+
+.fasting-ring {
+  position: relative;
+  width: min(260px, 80vw);
+  aspect-ratio: 1;
+  margin: 16px auto;
+}
+
+.fasting-ring svg { width: 100%; height: 100%; }
+.fasting-ring-track { fill: none; stroke: rgba(255,255,255,0.08); }
+
+.fasting-ring-progress {
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s ease;
+  filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.4));
+}
+
+.fasting-card.reached .fasting-ring-progress { filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.6)); }
+
+.fasting-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.fasting-ring-label { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.fasting-elapsed { font-family: 'Orbitron', monospace; font-size: 1.9rem; font-variant-numeric: tabular-nums; }
+.fasting-percent { font-size: 1.1rem; font-weight: 700; color: var(--gold); }
+.fasting-remaining { font-size: 0.85rem; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+
+.fasting-card.reached .fasting-percent,
+.fasting-card.reached .fasting-remaining { color: #34d399; }
+
+.fasting-achievement {
+  text-align: center;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  color: #6ee7b7;
+  font-size: 0.9rem;
+}
+
+.fasting-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 4px 0 12px; }
+
+.fasting-btn {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(15, 52, 96, 0.5);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.fasting-btn:hover { border-color: var(--gold); }
+.fasting-btn.primary { background: var(--gold); color: #000; border-color: var(--gold); font-weight: 700; }
+.fasting-btn.danger { background: rgba(233, 69, 96, 0.2); border-color: var(--accent); }
+.fasting-btn.danger:hover { background: rgba(233, 69, 96, 0.4); }
+
+.fasting-confirm,
+.fasting-edit {
+  background: rgba(10, 10, 21, 0.5);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.fasting-edit { display: flex; flex-direction: column; gap: 10px; text-align: left; }
+.fasting-edit label { display: flex; flex-direction: column; gap: 4px; color: var(--text-dim); font-size: 0.8rem; }
+.fasting-error { color: #f87171; font-size: 0.85rem; }
+
+.fasting-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.fasting-meta-card {
+  background: rgba(10, 10, 21, 0.45);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fasting-meta-label { color: var(--text-dim); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.fasting-meta-value { font-size: 0.85rem; font-weight: 600; }
+
+.fasting-phases { list-style: none; display: flex; justify-content: space-between; gap: 6px; margin-bottom: 12px; }
+
+.fasting-phase {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  opacity: 0.45;
+  font-size: 1.2rem;
+}
+
+.fasting-phase.current { opacity: 1; border-color: var(--gold); background: rgba(0, 229, 255, 0.08); }
+.fasting-phase-hours { font-size: 0.7rem; color: var(--text-dim); }
+.fasting-phase-text { font-size: 0.9rem; line-height: 1.4; margin-bottom: 8px; }
+
+.fasting-streak { font-size: 0.85rem; color: #fb923c; font-weight: 700; }
+
+.fasting-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 14px; }
+
+.fasting-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 2px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.06);
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+.fasting-day.today { border-color: var(--gold); }
+.fasting-day.completed { background: rgba(16, 185, 129, 0.12); }
+.fasting-day-name { text-transform: capitalize; }
+.fasting-day-mark { font-size: 1rem; color: var(--text); }
+
+.fasting-history { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+
+.fasting-history li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.85rem;
+  padding: 6px 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+@media (max-width: 480px) {
+  .fasting-meta { grid-template-columns: 1fr; }
+  .fasting-elapsed { font-size: 1.6rem; }
+}

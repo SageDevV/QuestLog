@@ -10,6 +10,7 @@ import HeroScene from './components/HeroScene';
 import BgMusic from './components/BgMusic';
 import ButtonClickSound from './components/ButtonClickSound';
 import QuestCalendar from './components/QuestCalendar';
+import FastingTimer from './components/FastingTimer';
 import DashboardStats from './components/DashboardStats';
 import LoginScreen from './components/LoginScreen';
 import StartJourneyScreen from './components/StartJourneyScreen';
@@ -22,12 +23,14 @@ export default function App() {
   const { user, loading } = useAuth();
   const quests = useStore(s => s.quests);
   const hero = useStore(s => s.hero);
+  const activeFast = useStore(s => s.activeFast);
+  const fastHistory = useStore(s => s.fastHistory);
   const levelUpMsg = useStore(s => s.levelUpMsg);
   const clearLevelUpMsg = useStore(s => s.clearLevelUpMsg);
   const dayClearMsg = useStore(s => s.dayClearMsg);
   const clearDayClearMsg = useStore(s => s.clearDayClearMsg);
   
-  const [filter, setFilter] = useState<'active' | 'completed' | 'calendar' | 'dashboard'>('active');
+  const [filter, setFilter] = useState<'active' | 'completed' | 'calendar' | 'dashboard' | 'fasting'>('active');
   const [dataLoaded, setDataLoaded] = useState(false);
   const [storeHydrated, setStoreHydrated] = useState(false);
   const [hasStartedJourney, setHasStartedJourney] = useState(false);
@@ -97,7 +100,7 @@ export default function App() {
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
-  }, [quests, hero, user, dataLoaded]);
+  }, [quests, hero, activeFast, fastHistory, user, dataLoaded]);
 
   // Flush pending saves immediately when page becomes hidden or unloads
   useEffect(() => {
@@ -268,7 +271,7 @@ export default function App() {
         {dayClearMsg && <div className="level-up-toast day-clear">{dayClearMsg}</div>}
 
         <HeroPanel />
-        {filter !== 'dashboard' && <QuestForm />}
+        {filter !== 'dashboard' && filter !== 'fasting' && <QuestForm />}
 
         <div className="filter-bar" style={{ flexWrap: 'wrap', marginBottom:'25px' }}>
           <button className={filter === 'active' ? 'active' : ''} onClick={() => setFilter('active')}>
@@ -283,9 +286,13 @@ export default function App() {
           <button className={filter === 'dashboard' ? 'active' : ''} onClick={() => setFilter('dashboard')} style={{ background: filter === 'dashboard' ? '#00e5ff' : 'rgba(0,229,255,0.1)', color: filter === 'dashboard' ? '#000': '#00e5ff', borderColor:'#00e5ff'}}>
             📊 Dashboard
           </button>
+          <button className={filter === 'fasting' ? 'active' : ''} onClick={() => setFilter('fasting')}>
+            ⏱️ Jejum{activeFast ? ' •' : ''}
+          </button>
         </div>
 
         {filter === 'dashboard' && <DashboardStats />}
+        {filter === 'fasting' && <FastingTimer />}
         {filter === 'calendar' && (
           <QuestCalendar 
             quests={quests} 

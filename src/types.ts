@@ -49,6 +49,20 @@ export interface Hero {
   streakLastDate?: number;
 }
 
+export interface ActiveFast {
+  startedAt: number;
+  targetHours: number;
+  protocolId: string;
+}
+
+export interface FastRecord {
+  id: string;
+  startedAt: number;
+  endedAt: number;
+  targetHours: number;
+  protocolId: string;
+}
+
 export const DIFFICULTY_CONFIG: Record<QuestDifficulty, { label: string; xp: number; gold: number; emoji: string; color: string }> = {
   easy: { label: 'Fácil', xp: 25, gold: 10, emoji: '🟢', color: '#4ade80' },
   medium: { label: 'Médio', xp: 50, gold: 25, emoji: '🟡', color: '#facc15' },

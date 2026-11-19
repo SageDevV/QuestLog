@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Quest, Hero, DIFFICULTY_CONFIG, getTitle } from './types';
+import { Quest, Hero, ActiveFast, FastRecord, DIFFICULTY_CONFIG, getTitle } from './types';
+import { MAX_HISTORY } from './fastingUtils';
 
 // Default initial state
 const defaultHero = (): Hero => ({
@@ -12,8 +13,13 @@ interface AppState {
   hero: Hero;
   quests: Quest[];
   levelUpMsg: string;
-  
+  activeFast: ActiveFast | null;
+  fastHistory: FastRecord[];
+
   // Actions
+  startFast: (protocolId: string, targetHours: number) => void;
+  updateFast: (updates: Partial<ActiveFast>) => void;
+  endFast: () => void;
   setHeroName: (name: string) => void;
   resetHero: () => void;
   resetStreak: () => void;
@@ -37,8 +43,24 @@ export const useStore = create<AppState>()(
       hero: defaultHero(),
       quests: [],
       levelUpMsg: '',
+      activeFast: null,
+      fastHistory: [],
       dayClearMsg: '',
       undoToastQuestId: null,
+
+      startFast: (protocolId, targetHours) => set((s) =>
+        s.activeFast ? s : { activeFast: { startedAt: Date.now(), targetHours, protocolId } }
+      ),
+
+      updateFast: (updates) => set((s) =>
+        s.activeFast ? { activeFast: { ...s.activeFast, ...updates } } : s
+      ),
+
+      endFast: () => set((s) => {
+        if (!s.activeFast) return s;
+        const record: FastRecord = { id: `fast-${Date.now()}`, ...s.activeFast, endedAt: Date.now() };
+        return { activeFast: null, fastHistory: [record, ...s.fastHistory].slice(0, MAX_HISTORY) };
+      }),
 
       setUndoToastQuestId: (id) => set({ undoToastQuestId: id }),
 
