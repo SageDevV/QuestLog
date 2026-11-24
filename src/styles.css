@@ -1198,28 +1198,53 @@ body {
 /* Music toggle button */
 .music-toggle {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 22px;
+  right: 22px;
   z-index: 100;
-  width: 48px;
+  width: 106px;
   height: 48px;
-  border-radius: 50%;
-  background: rgba(22, 33, 62, 0.9);
-  border: 1px solid rgba(255,255,255,0.15);
-  color: var(--text);
-  font-size: 1.4rem;
+  padding: 0 11px 0 7px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(8, 25, 49, 0.96), rgba(15, 37, 67, 0.88));
+  border: 1px solid rgba(0, 229, 255, 0.38);
+  box-shadow: 0 0 0 1px rgba(0, 229, 255, 0.06) inset, 0 8px 24px rgba(0, 0, 0, 0.32);
+  color: var(--text-dim);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s, box-shadow 0.2s;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
   pointer-events: auto;
+  overflow: hidden;
 }
 
-.music-toggle:hover {
-  background: rgba(233, 69, 96, 0.3);
-  border-color: var(--accent);
-  transform: scale(1.1);
+.music-toggle::before,
+.music-toggle::after {
+  content: '';
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  pointer-events: none;
+}
+.music-toggle::before { top: -1px; left: -1px; border-top: 2px solid var(--accent); border-left: 2px solid var(--accent); }
+.music-toggle::after { right: -1px; bottom: -1px; border-right: 2px solid var(--accent); border-bottom: 2px solid var(--accent); }
+.music-toggle:hover { border-color: var(--accent); background: linear-gradient(135deg, rgba(8, 39, 66, 0.98), rgba(15, 52, 82, 0.92)); box-shadow: 0 0 20px rgba(0, 229, 255, 0.2), 0 0 0 1px rgba(0, 229, 255, 0.15) inset; transform: translateY(-2px); }
+.music-toggle:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.music-toggle-icon { width: 32px; height: 32px; display: grid; place-items: center; color: var(--accent); background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.22); border-radius: 5px; }
+.music-toggle-icon svg { width: 19px; height: 19px; }
+.music-toggle-label { color: var(--text-dim); font-family: 'Orbitron', sans-serif; font-size: 0.61rem; font-weight: 600; letter-spacing: 0.08em; }
+.music-signal { display: flex; align-items: end; gap: 2px; height: 14px; margin-left: auto; }
+.music-signal i { display: block; width: 2px; height: 4px; background: rgba(0, 229, 255, 0.35); border-radius: 2px; }
+.music-signal i:nth-child(2) { height: 8px; }
+.music-signal i:nth-child(3) { height: 12px; }
+.music-toggle.is-playing { border-color: rgba(0, 229, 255, 0.8); }
+.music-toggle.is-playing .music-toggle-icon { color: #071722; background: var(--accent); box-shadow: 0 0 15px rgba(0, 229, 255, 0.55); }
+.music-toggle.is-playing .music-toggle-label { color: var(--text); }
+.music-toggle.is-playing .music-signal i { background: var(--accent); animation: music-signal-pulse 0.8s ease-in-out infinite alternate; }
+.music-toggle.is-playing .music-signal i:nth-child(2) { animation-delay: 0.18s; }
+.music-toggle.is-playing .music-signal i:nth-child(3) { animation-delay: 0.35s; }
+@keyframes music-signal-pulse { from { transform: scaleY(0.45); opacity: 0.55; } to { transform: scaleY(1); opacity: 1; } }
+@media (max-width: 520px) { .music-toggle { right: 14px; bottom: 14px; width: 48px; padding: 0; justify-content: center; } .music-toggle-label, .music-signal { display: none; } }
 }
 
 /* ===== Quest Calendar ===== */
