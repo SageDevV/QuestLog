@@ -81,13 +81,16 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
       <textarea placeholder="Sussurre a descrição (opcional)..." value={description} onChange={e => setDescription(e.target.value)} rows={2} />
 
       <div className="checklist-editor">
-        <label>☑ Checklist da missão</label>
+        <div className="checklist-editor-heading">
+          <label>☑ Checklist da missão</label>
+          <span>Opcional</span>
+        </div>
         <div className="checklist-add-row">
           <input value={checklistText} onChange={e => setChecklistText(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addChecklistItem(); } }} placeholder="Adicionar item..." />
-          <button type="button" onClick={addChecklistItem}>Adicionar</button>
+          <button type="button" className="checklist-add-button" onClick={addChecklistItem}>+ Adicionar</button>
         </div>
         {checklist.length > 0 && <ul className="checklist-editor-items">
-          {checklist.map(item => <li key={item.id}><span>{item.title}</span><button type="button" aria-label={`Remover ${item.title}`} onClick={() => setChecklist(current => current.filter(entry => entry.id !== item.id))}>×</button></li>)}
+          {checklist.map(item => <li key={item.id}><span>{item.title}</span><button className="checklist-remove-button" type="button" aria-label={`Remover ${item.title}`} onClick={() => setChecklist(current => current.filter(entry => entry.id !== item.id))}>×</button></li>)}
         </ul>}
       </div>
 

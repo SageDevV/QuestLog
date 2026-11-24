@@ -132,12 +132,12 @@ export default function QuestList({ quests, highlightHard }: Props) {
                     placeholder="Descreva os detalhes da missão..."
                   />
                   <div className="checklist-editor quick-checklist-editor">
-                    <label>☑ Checklist</label>
+                    <div className="checklist-editor-heading"><label>☑ Checklist</label><span>Itens da missão</span></div>
                     <div className="checklist-add-row">
                       <input value={newChecklistItem} onChange={e => setNewChecklistItem(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTemporaryChecklistItem(); } }} placeholder="Novo item..." />
-                      <button type="button" onClick={addTemporaryChecklistItem}>Adicionar</button>
+                      <button type="button" className="checklist-add-button" onClick={addTemporaryChecklistItem}>+ Adicionar</button>
                     </div>
-                    {tempChecklist.map(item => <div className="checklist-edit-item" key={item.id}><span>{item.title}</span><button type="button" onClick={() => setTempChecklist(current => current.filter(entry => entry.id !== item.id))}>Remover</button></div>)}
+                    {tempChecklist.map(item => <div className="checklist-edit-item" key={item.id}><span>{item.title}</span><button className="checklist-remove-button" type="button" aria-label={`Remover ${item.title}`} onClick={() => setTempChecklist(current => current.filter(entry => entry.id !== item.id))}>×</button></div>)}
                   </div>
                   <div className="quick-edit-actions">
                     <button onClick={() => handleSave(quest.id)} className="save-desc-btn">Salvar</button>
