@@ -393,6 +393,36 @@ body {
   margin-bottom: 12px;
 }
 
+.checklist-editor {
+  display: grid;
+  gap: 7px;
+  margin: 4px 0 12px;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+.checklist-add-row {
+  display: flex;
+  gap: 8px;
+}
+
+.checklist-add-row input { min-width: 0; flex: 1; }
+.checklist-add-row button, .checklist-editor-items button, .checklist-edit-item button {
+  border: 1px solid rgba(0, 229, 255, 0.35);
+  border-radius: 6px;
+  background: rgba(0, 229, 255, 0.1);
+  color: var(--accent);
+  cursor: pointer;
+}
+.checklist-editor-items { display: grid; gap: 5px; margin: 0; padding: 0; list-style: none; }
+.checklist-editor-items li, .checklist-edit-item { display: flex; justify-content: space-between; gap: 8px; }
+.quest-checklist { display: grid; gap: 6px; margin-top: 10px; }
+.quest-checklist-title { color: var(--text-dim); font-size: 0.82rem; }
+.quest-checklist-title span { color: var(--accent); }
+.quest-checklist-item { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem; }
+.quest-checklist-item input { accent-color: var(--accent); }
+.quest-checklist-item.done span { color: var(--text-dim); text-decoration: line-through; }
+
 .edit-icon-btn {
   background: transparent;
   border: none;

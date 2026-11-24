@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Quest, DIFFICULTY_CONFIG, QuestAgent, AGENT_CONFIG } from '../types';
+import { Quest, DIFFICULTY_CONFIG, QuestAgent, AGENT_CONFIG, ChecklistItem } from '../types';
 import { useStore } from '../store';
 
 interface Props { quests: Quest[]; highlightHard?: boolean; }
@@ -15,6 +15,8 @@ export default function QuestList({ quests, highlightHard }: Props) {
   const [tempDesc, setTempDesc] = useState('');
   const [tempProgress, setTempProgress] = useState(0);
   const [tempAgent, setTempAgent] = useState<QuestAgent | undefined>(undefined);
+  const [tempChecklist, setTempChecklist] = useState<ChecklistItem[]>([]);
+  const [newChecklistItem, setNewChecklistItem] = useState('');
 
   if (quests.length === 0) return <div className="empty-msg">Nenhum rastro encontrado... O horizonte está limpo e sereno! 🗺️</div>;
 
@@ -24,10 +26,12 @@ export default function QuestList({ quests, highlightHard }: Props) {
     setTempDesc(quest.description || '');
     setTempProgress(quest.progress || 0);
     setTempAgent(quest.agentLabel);
+    setTempChecklist(quest.checklist || []);
+    setNewChecklistItem('');
   };
 
   const handleSave = (id: string) => {
-    updateQuest(id, { title: tempTitle, description: tempDesc, progress: tempProgress, agentLabel: tempAgent });
+    updateQuest(id, { title: tempTitle, description: tempDesc, progress: tempProgress, agentLabel: tempAgent, checklist: tempChecklist });
     setEditingId(null);
   };
 
@@ -37,6 +41,15 @@ export default function QuestList({ quests, highlightHard }: Props) {
     setTempDesc('');
     setTempProgress(0);
     setTempAgent(undefined);
+    setTempChecklist([]);
+    setNewChecklistItem('');
+  };
+
+  const addTemporaryChecklistItem = () => {
+    const title = newChecklistItem.trim();
+    if (!title) return;
+    setTempChecklist(current => [...current, { id: crypto.randomUUID(), title, completed: false }]);
+    setNewChecklistItem('');
   };
 
   return (
@@ -46,6 +59,8 @@ export default function QuestList({ quests, highlightHard }: Props) {
         const isRecurrent = quest.recurrenceType && quest.recurrenceType !== 'single';
         const isEditing = editingId === quest.id;
         const shouldHighlight = highlightHard && !quest.completed && (quest.difficulty === 'hard' || quest.difficulty === 'legendary');
+        const checklist = quest.checklist || [];
+        const completedChecklistItems = checklist.filter(item => item.completed).length;
 
         return (
           <div 
@@ -116,6 +131,14 @@ export default function QuestList({ quests, highlightHard }: Props) {
                     onChange={e => setTempDesc(e.target.value)}
                     placeholder="Descreva os detalhes da missão..."
                   />
+                  <div className="checklist-editor quick-checklist-editor">
+                    <label>☑ Checklist</label>
+                    <div className="checklist-add-row">
+                      <input value={newChecklistItem} onChange={e => setNewChecklistItem(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTemporaryChecklistItem(); } }} placeholder="Novo item..." />
+                      <button type="button" onClick={addTemporaryChecklistItem}>Adicionar</button>
+                    </div>
+                    {tempChecklist.map(item => <div className="checklist-edit-item" key={item.id}><span>{item.title}</span><button type="button" onClick={() => setTempChecklist(current => current.filter(entry => entry.id !== item.id))}>Remover</button></div>)}
+                  </div>
                   <div className="quick-edit-actions">
                     <button onClick={() => handleSave(quest.id)} className="save-desc-btn">Salvar</button>
                     <button onClick={handleCancelEdit} className="cancel-desc-btn">Cancelar</button>
@@ -135,6 +158,13 @@ export default function QuestList({ quests, highlightHard }: Props) {
               ) : (
                 <>
                   {quest.description && <p className="quest-desc">{quest.description}</p>}
+                  {checklist.length > 0 && <div className="quest-checklist">
+                    <div className="quest-checklist-title">☑ Checklist <span>{completedChecklistItems}/{checklist.length}</span></div>
+                    {checklist.map(item => <label key={item.id} className={`quest-checklist-item ${item.completed ? 'done' : ''}`}>
+                      <input type="checkbox" checked={item.completed} disabled={quest.completed} onChange={() => updateQuest(quest.id, { checklist: checklist.map(entry => entry.id === item.id ? { ...entry, completed: !entry.completed } : entry) })} />
+                      <span>{item.title}</span>
+                    </label>)}
+                  </div>}
                 </>
               )}
             </div>

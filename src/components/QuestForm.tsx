@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { QuestDifficulty, DIFFICULTY_CONFIG, RecurrenceType, QuestTag, QuestAgent, AGENT_CONFIG, Quest } from '../types';
+import { QuestDifficulty, DIFFICULTY_CONFIG, RecurrenceType, QuestTag, QuestAgent, AGENT_CONFIG, Quest, ChecklistItem } from '../types';
 import { generateOccurrences, validateRecurrenceConfig } from '../recurrenceUtils';
 import { useStore } from '../store';
 
@@ -26,11 +26,20 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
   const [selectedWeekdays, setSelectedWeekdays] = useState<number[]>([]); // Note: recurrence editing is simplified here
   const [formError, setFormError] = useState<string | null>(null);
   const [applyToAll, setApplyToAll] = useState(false);
+  const [checklist, setChecklist] = useState<ChecklistItem[]>(initialQuest?.checklist || []);
+  const [checklistText, setChecklistText] = useState('');
+
+  const addChecklistItem = () => {
+    const itemTitle = checklistText.trim();
+    if (!itemTitle) return;
+    setChecklist(current => [...current, { id: crypto.randomUUID(), title: itemTitle, completed: false }]);
+    setChecklistText('');
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (initialQuest) {
-      const updates = { title: title.trim(), description: description.trim(), difficulty, tag, agentLabel, scheduledDate: new Date(scheduledDate + 'T12:00:00').getTime() };
+      const updates = { title: title.trim(), description: description.trim(), difficulty, tag, agentLabel, checklist, scheduledDate: new Date(scheduledDate + 'T12:00:00').getTime() };
       if (applyToAll) updateAllMatching(initialQuest.id, updates);
       else updateQuest(initialQuest.id, updates);
       if (onCancel) onCancel();
@@ -51,11 +60,12 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
 
     const timestamps = generateOccurrences(config);
     const quests: Quest[] = timestamps.map(ts => ({
-      id: crypto.randomUUID(), title: title.trim(), description: description.trim(), difficulty, tag, agentLabel, completed: false, createdAt: Date.now(), scheduledDate: ts, recurrenceType
+      id: crypto.randomUUID(), title: title.trim(), description: description.trim(), difficulty, tag, agentLabel, completed: false, createdAt: Date.now(), scheduledDate: ts, recurrenceType,
+      checklist: checklist.map(item => ({ ...item, id: crypto.randomUUID(), completed: false }))
     }));
 
     addQuest(quests);
-    setOpen(false); setTitle('');
+    setOpen(false); setTitle(''); setChecklist([]); setChecklistText('');
   };
 
   const handleCancel = () => {
@@ -69,6 +79,17 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
     <form className="quest-form" onSubmit={handleSubmit}>
       <input placeholder="Título épico da missão..." value={title} onChange={e => setTitle(e.target.value)} autoFocus required />
       <textarea placeholder="Sussurre a descrição (opcional)..." value={description} onChange={e => setDescription(e.target.value)} rows={2} />
+
+      <div className="checklist-editor">
+        <label>☑ Checklist da missão</label>
+        <div className="checklist-add-row">
+          <input value={checklistText} onChange={e => setChecklistText(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addChecklistItem(); } }} placeholder="Adicionar item..." />
+          <button type="button" onClick={addChecklistItem}>Adicionar</button>
+        </div>
+        {checklist.length > 0 && <ul className="checklist-editor-items">
+          {checklist.map(item => <li key={item.id}><span>{item.title}</span><button type="button" aria-label={`Remover ${item.title}`} onClick={() => setChecklist(current => current.filter(entry => entry.id !== item.id))}>×</button></li>)}
+        </ul>}
+      </div>
 
       <div className="recurrence-selector">
         {RECURRENCE_OPTIONS.map(opt => ( <button key={opt.type} type="button" className={`recurrence-btn ${recurrenceType === opt.type ? 'selected' : ''}`} onClick={() => setRecurrenceType(opt.type)}>{opt.label}</button> ))}
