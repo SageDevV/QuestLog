@@ -184,16 +184,17 @@ export default function App() {
 
       let burstCount = 0;
       const interval = setInterval(() => {
-        fireConfetti({ particleCount: 40, angle: 90, spread: 70, origin: { x: 0.5, y: 0.7 }, colors: ['#4ade80', '#facc15'], zIndex: 10000 });
+        fireConfetti({ particleCount: 26, angle: 58, spread: 38, startVelocity: 38, gravity: 0.72, origin: { x: 0.18, y: 0.78 }, colors: ['#00e5ff', '#ffffff', '#8b5cf6'], zIndex: 10000 });
+        fireConfetti({ particleCount: 26, angle: 122, spread: 38, startVelocity: 38, gravity: 0.72, origin: { x: 0.82, y: 0.78 }, colors: ['#00e5ff', '#ffffff', '#ff3d81'], zIndex: 10000 });
         burstCount++;
-        if (burstCount >= 3) clearInterval(interval);
-      }, 600);
+        if (burstCount >= 4) clearInterval(interval);
+      }, 420);
 
-      setTimeout(clearDayClearMsg, 4000);
+      setTimeout(clearDayClearMsg, 4300);
       return () => clearInterval(interval);
     } else if (dayClearMsg && levelUpMsg) {
       // If both happen, clear level up will handle the music, just clear day message after some time
-      setTimeout(clearDayClearMsg, 4000);
+      setTimeout(clearDayClearMsg, 4300);
     }
   }, [dayClearMsg, levelUpMsg, clearDayClearMsg]);
 
@@ -264,6 +265,20 @@ export default function App() {
         setHighlightHardQuests(true);
         setTimeout(() => setHighlightHardQuests(false), 3000);
       }} />}
+      {dayClearMsg && (
+        <div className="stage-clear-overlay" role="status" aria-live="assertive">
+          <div className="stage-clear-beam stage-clear-beam-left" />
+          <div className="stage-clear-beam stage-clear-beam-right" />
+          <div className="stage-clear-panel">
+            <div className="stage-clear-corners" aria-hidden="true" />
+            <p className="stage-clear-kicker">MAVERICK HUNTER SYSTEM // DAILY OPERATION</p>
+            <div className="stage-clear-title"><span>STAGE</span><strong>CLEAR</strong></div>
+            <div className="stage-clear-energy" aria-hidden="true"><i /><i /><i /><i /><i /></div>
+            <p className="stage-clear-message">SETOR DO DIA NEUTRALIZADO</p>
+            <div className="stage-clear-readout"><span>RANK <b>S</b></span><span>ALL OBJECTIVES COMPLETE</span></div>
+          </div>
+        </div>
+      )}
       
 
 
@@ -280,7 +295,6 @@ export default function App() {
         </header>
 
         {levelUpMsg && <div className="level-up-toast">{levelUpMsg}</div>}
-        {dayClearMsg && <div className="level-up-toast day-clear">{dayClearMsg}</div>}
 
         <HeroPanel />
         {filter !== 'dashboard' && filter !== 'fasting' && filter !== 'nofap' && <QuestForm />}

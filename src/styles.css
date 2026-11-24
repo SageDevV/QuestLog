@@ -56,6 +56,61 @@ body {
   box-shadow: 0 0 15px rgba(74, 222, 128, 0.2);
 }
 
+/* Mega Man X-inspired daily mission clear sequence */
+.stage-clear-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.14), rgba(3, 7, 20, 0.82) 62%, rgba(1, 3, 10, 0.94));
+  animation: stage-clear-overlay-in 0.24s ease-out both;
+}
+.stage-clear-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+  background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(126, 243, 255, 0.75) 3px 4px);
+  animation: stage-clear-scan 0.35s steps(2) infinite;
+}
+.stage-clear-beam { position: absolute; width: 26vw; height: 2px; top: 50%; background: linear-gradient(90deg, transparent, #00e5ff, #fff); box-shadow: 0 0 12px #00e5ff, 0 0 30px rgba(0, 229, 255, 0.75); animation: stage-clear-beam 0.9s cubic-bezier(.15,.8,.2,1) both; }
+.stage-clear-beam-left { right: 50%; transform-origin: right center; }
+.stage-clear-beam-right { left: 50%; background: linear-gradient(90deg, #fff, #00e5ff, transparent); transform-origin: left center; }
+.stage-clear-panel {
+  position: relative;
+  width: min(88vw, 560px);
+  padding: 28px 30px 24px;
+  text-align: center;
+  color: #eaffff;
+  background: linear-gradient(135deg, rgba(6, 21, 47, 0.96), rgba(12, 51, 82, 0.9));
+  border: 1px solid #00e5ff;
+  clip-path: polygon(0 15px, 15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px));
+  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.11), 0 0 42px rgba(0, 229, 255, 0.48), inset 0 0 44px rgba(0, 229, 255, 0.1);
+  animation: stage-clear-panel-in 0.55s cubic-bezier(.16,1,.3,1) 0.12s both;
+}
+.stage-clear-corners::before, .stage-clear-corners::after { content: ''; position: absolute; width: 46px; height: 4px; background: #ff3d81; box-shadow: 0 0 12px #ff3d81; }
+.stage-clear-corners::before { top: 10px; left: -8px; }
+.stage-clear-corners::after { bottom: 10px; right: -8px; }
+.stage-clear-kicker { margin-bottom: 9px; color: #86f5ff; font-family: 'Orbitron', sans-serif; font-size: clamp(0.52rem, 1.8vw, 0.68rem); letter-spacing: 0.15em; }
+.stage-clear-title { display: flex; flex-direction: column; font-family: 'Orbitron', sans-serif; font-weight: 700; letter-spacing: 0.1em; line-height: 0.83; text-shadow: 0 0 16px rgba(0, 229, 255, 0.8); }
+.stage-clear-title span { color: #d9fbff; font-size: clamp(1.65rem, 8vw, 3rem); }
+.stage-clear-title strong { color: #00e5ff; font-size: clamp(2.9rem, 15vw, 5.8rem); font-weight: 700; }
+.stage-clear-energy { display: flex; justify-content: center; gap: 5px; margin: 18px auto 14px; }
+.stage-clear-energy i { width: 42px; max-width: 13vw; height: 5px; background: #00e5ff; box-shadow: 0 0 8px #00e5ff; animation: stage-clear-energy 0.65s ease-in-out infinite alternate; }
+.stage-clear-energy i:nth-child(2) { animation-delay: .08s; }.stage-clear-energy i:nth-child(3) { animation-delay: .16s; }.stage-clear-energy i:nth-child(4) { animation-delay: .24s; }.stage-clear-energy i:nth-child(5) { animation-delay: .32s; }
+.stage-clear-message { color: #fff; font-size: clamp(.72rem, 2.4vw, .92rem); font-weight: 700; letter-spacing: .11em; }
+.stage-clear-readout { display: flex; justify-content: center; gap: 15px; margin-top: 17px; padding-top: 9px; border-top: 1px solid rgba(134, 245, 255, 0.32); color: #8db6d2; font-family: 'Orbitron', sans-serif; font-size: clamp(.48rem, 1.7vw, .62rem); letter-spacing: .08em; }
+.stage-clear-readout b { margin-left: 4px; color: #ff3d81; font-size: 1.15rem; text-shadow: 0 0 10px #ff3d81; }
+@keyframes stage-clear-overlay-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes stage-clear-panel-in { from { opacity: 0; transform: scaleX(.45) scaleY(.75); filter: brightness(2); } to { opacity: 1; transform: scale(1); filter: brightness(1); } }
+@keyframes stage-clear-beam { from { opacity: 0; transform: scaleX(0); } 45% { opacity: 1; } to { opacity: .12; transform: scaleX(2.5); } }
+@keyframes stage-clear-scan { from { transform: translateY(0); } to { transform: translateY(4px); } }
+@keyframes stage-clear-energy { from { opacity: .35; transform: scaleX(.55); } to { opacity: 1; transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .stage-clear-overlay, .stage-clear-panel, .stage-clear-beam, .stage-clear-energy i { animation: none; } }
+
 @keyframes toast-in {
   from { opacity: 0; transform: translateY(-20px) scale(0.95); }
   to { opacity: 1; transform: translateY(0) scale(1); }
