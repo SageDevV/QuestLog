@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Quest, Hero, ActiveFast, FastRecord, NoFapState, DailyLogEntry, SprintImpediment, DIFFICULTY_CONFIG, getTitle } from './types';
+import { Quest, Hero, ActiveFast, FastRecord, NoFapState, DailyLogEntry, SprintImpediment, TimeClockPortalAccess, DIFFICULTY_CONFIG, getTitle } from './types';
 import { MAX_HISTORY } from './fastingUtils';
 import { getNoFapDays } from './noFapUtils';
 
@@ -19,6 +19,7 @@ interface AppState {
   noFap: NoFapState | null;
   dailyLogs: DailyLogEntry[];
   sprintImpediments: SprintImpediment[];
+  timeClockPortalAccesses: TimeClockPortalAccess[];
 
   // Actions
   startNoFap: () => void;
@@ -31,6 +32,7 @@ interface AppState {
   addSprintImpediment: (title: string, details: string) => void;
   toggleSprintImpediment: (id: string) => void;
   deleteSprintImpediment: (id: string) => void;
+  recordTimeClockPortalAccess: () => void;
   setHeroName: (name: string) => void;
   resetHero: () => void;
   addQuest: (q: Quest | Quest[]) => void;
@@ -59,6 +61,7 @@ export const useStore = create<AppState>()(
       noFap: null,
       dailyLogs: [],
       sprintImpediments: [],
+      timeClockPortalAccesses: [],
       dayClearMsg: '',
       undoToastQuestId: null,
 
@@ -132,6 +135,10 @@ export const useStore = create<AppState>()(
 
       deleteSprintImpediment: (id) => set((s) => ({
         sprintImpediments: s.sprintImpediments.filter(item => item.id !== id),
+      })),
+
+      recordTimeClockPortalAccess: () => set((s) => ({
+        timeClockPortalAccesses: [{ id: crypto.randomUUID(), accessedAt: Date.now() }, ...s.timeClockPortalAccesses].slice(0, 60),
       })),
 
       setHeroName: (name) => set((s) => ({ hero: { ...s.hero, name } })),

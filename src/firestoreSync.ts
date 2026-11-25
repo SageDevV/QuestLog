@@ -1,7 +1,7 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { useStore } from './store';
-import type { Quest, Hero, ActiveFast, FastRecord, NoFapState, DailyLogEntry, SprintImpediment } from './types';
+import type { Quest, Hero, ActiveFast, FastRecord, NoFapState, DailyLogEntry, SprintImpediment, TimeClockPortalAccess } from './types';
 
 interface UserData {
   userName?: string;
@@ -14,6 +14,7 @@ interface UserData {
   noFap?: NoFapState | null;
   dailyLogs?: DailyLogEntry[];
   sprintImpediments?: SprintImpediment[];
+  timeClockPortalAccesses?: TimeClockPortalAccess[];
 }
 
 /**
@@ -57,6 +58,7 @@ export async function loadUserData(uid: string, email?: string | null): Promise<
         noFap: data.noFap !== undefined ? data.noFap : localState.noFap,
         dailyLogs: data.dailyLogs ?? localState.dailyLogs,
         sprintImpediments: data.sprintImpediments ?? localState.sprintImpediments,
+        timeClockPortalAccesses: data.timeClockPortalAccesses ?? localState.timeClockPortalAccesses,
       });
     } else {
       // First login: migrate current localStorage data to Firestore
@@ -71,7 +73,7 @@ export async function loadUserData(uid: string, email?: string | null): Promise<
 export async function saveUserData(uid: string, email?: string | null): Promise<void> {
   if (!db) return;
   try {
-    const { hero, quests, activeFast, fastHistory, noFap, dailyLogs, sprintImpediments } = useStore.getState();
+    const { hero, quests, activeFast, fastHistory, noFap, dailyLogs, sprintImpediments, timeClockPortalAccesses } = useStore.getState();
     const docRef = doc(db, 'users', uid);
     const dataToSave: Record<string, unknown> = { 
       userName: hero.name,
@@ -82,7 +84,8 @@ export async function saveUserData(uid: string, email?: string | null): Promise<
       fastHistory,
       noFap,
       dailyLogs,
-      sprintImpediments
+      sprintImpediments,
+      timeClockPortalAccesses
     };
     
     if (email) {

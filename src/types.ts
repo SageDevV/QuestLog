@@ -60,6 +60,11 @@ export interface SprintImpediment {
   resolvedAt?: number;
 }
 
+export interface TimeClockPortalAccess {
+  id: string;
+  accessedAt: number;
+}
+
 export interface Hero {
   name: string;
   level: number;
