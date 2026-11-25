@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Quest, Hero, ActiveFast, FastRecord, NoFapState, DailyLogEntry, SprintImpediment, TimeClockPortalAccess, DIFFICULTY_CONFIG, getTitle } from './types';
+import { Quest, Hero, ActiveFast, FastRecord, NoFapState, DailyLogEntry, SprintImpediment, TimeClockPortalAccess, CountdownTimer, SprintAlarm, DIFFICULTY_CONFIG, getTitle } from './types';
 import { MAX_HISTORY } from './fastingUtils';
 import { getNoFapDays } from './noFapUtils';
 
@@ -20,6 +20,8 @@ interface AppState {
   dailyLogs: DailyLogEntry[];
   sprintImpediments: SprintImpediment[];
   timeClockPortalAccesses: TimeClockPortalAccess[];
+  countdownTimers: CountdownTimer[];
+  sprintAlarms: SprintAlarm[];
 
   // Actions
   startNoFap: () => void;
@@ -33,6 +35,15 @@ interface AppState {
   toggleSprintImpediment: (id: string) => void;
   deleteSprintImpediment: (id: string) => void;
   recordTimeClockPortalAccess: () => void;
+  addCountdownTimer: (label: string, durationSeconds: number) => void;
+  startCountdownTimer: (id: string) => void;
+  pauseCountdownTimer: (id: string) => void;
+  resetCountdownTimer: (id: string) => void;
+  deleteCountdownTimer: (id: string) => void;
+  addSprintAlarm: (label: string, time: string) => void;
+  toggleSprintAlarm: (id: string) => void;
+  markSprintAlarmTriggered: (id: string, date: string) => void;
+  deleteSprintAlarm: (id: string) => void;
   setHeroName: (name: string) => void;
   resetHero: () => void;
   addQuest: (q: Quest | Quest[]) => void;
@@ -62,6 +73,8 @@ export const useStore = create<AppState>()(
       dailyLogs: [],
       sprintImpediments: [],
       timeClockPortalAccesses: [],
+      countdownTimers: [],
+      sprintAlarms: [],
       dayClearMsg: '',
       undoToastQuestId: null,
 
@@ -140,6 +153,47 @@ export const useStore = create<AppState>()(
       recordTimeClockPortalAccess: () => set((s) => ({
         timeClockPortalAccesses: [{ id: crypto.randomUUID(), accessedAt: Date.now() }, ...s.timeClockPortalAccesses].slice(0, 60),
       })),
+
+      addCountdownTimer: (label, durationSeconds) => set((s) => {
+        const seconds = Math.max(1, Math.floor(durationSeconds));
+        return { countdownTimers: [{ id: crypto.randomUUID(), label: label.trim() || 'Timer sem nome', durationSeconds: seconds, remainingSeconds: seconds, completed: false }, ...s.countdownTimers] };
+      }),
+
+      startCountdownTimer: (id) => set((s) => ({
+        countdownTimers: s.countdownTimers.map(timer => timer.id === id && timer.remainingSeconds > 0
+          ? { ...timer, endsAt: Date.now() + timer.remainingSeconds * 1000, completed: false }
+          : timer),
+      })),
+
+      pauseCountdownTimer: (id) => set((s) => ({
+        countdownTimers: s.countdownTimers.map(timer => {
+          if (timer.id !== id || !timer.endsAt) return timer;
+          const remainingSeconds = Math.max(0, Math.ceil((timer.endsAt - Date.now()) / 1000));
+          return { ...timer, remainingSeconds, endsAt: undefined, completed: remainingSeconds === 0 };
+        }),
+      })),
+
+      resetCountdownTimer: (id) => set((s) => ({
+        countdownTimers: s.countdownTimers.map(timer => timer.id === id
+          ? { ...timer, remainingSeconds: timer.durationSeconds, endsAt: undefined, completed: false }
+          : timer),
+      })),
+
+      deleteCountdownTimer: (id) => set((s) => ({ countdownTimers: s.countdownTimers.filter(timer => timer.id !== id) })),
+
+      addSprintAlarm: (label, time) => set((s) => ({
+        sprintAlarms: [{ id: crypto.randomUUID(), label: label.trim() || 'Despertador', time, enabled: true }, ...s.sprintAlarms],
+      })),
+
+      toggleSprintAlarm: (id) => set((s) => ({
+        sprintAlarms: s.sprintAlarms.map(alarm => alarm.id === id ? { ...alarm, enabled: !alarm.enabled } : alarm),
+      })),
+
+      markSprintAlarmTriggered: (id, date) => set((s) => ({
+        sprintAlarms: s.sprintAlarms.map(alarm => alarm.id === id ? { ...alarm, lastTriggeredDate: date } : alarm),
+      })),
+
+      deleteSprintAlarm: (id) => set((s) => ({ sprintAlarms: s.sprintAlarms.filter(alarm => alarm.id !== id) })),
 
       setHeroName: (name) => set((s) => ({ hero: { ...s.hero, name } })),
       resetHero: () => set((s) => ({ 

@@ -1,7 +1,7 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { useStore } from './store';
-import type { Quest, Hero, ActiveFast, FastRecord, NoFapState, DailyLogEntry, SprintImpediment, TimeClockPortalAccess } from './types';
+import type { Quest, Hero, ActiveFast, FastRecord, NoFapState, DailyLogEntry, SprintImpediment, TimeClockPortalAccess, CountdownTimer, SprintAlarm } from './types';
 
 interface UserData {
   userName?: string;
@@ -15,6 +15,8 @@ interface UserData {
   dailyLogs?: DailyLogEntry[];
   sprintImpediments?: SprintImpediment[];
   timeClockPortalAccesses?: TimeClockPortalAccess[];
+  countdownTimers?: CountdownTimer[];
+  sprintAlarms?: SprintAlarm[];
 }
 
 /**
@@ -59,6 +61,8 @@ export async function loadUserData(uid: string, email?: string | null): Promise<
         dailyLogs: data.dailyLogs ?? localState.dailyLogs,
         sprintImpediments: data.sprintImpediments ?? localState.sprintImpediments,
         timeClockPortalAccesses: data.timeClockPortalAccesses ?? localState.timeClockPortalAccesses,
+        countdownTimers: data.countdownTimers ?? localState.countdownTimers,
+        sprintAlarms: data.sprintAlarms ?? localState.sprintAlarms,
       });
     } else {
       // First login: migrate current localStorage data to Firestore
@@ -73,7 +77,7 @@ export async function loadUserData(uid: string, email?: string | null): Promise<
 export async function saveUserData(uid: string, email?: string | null): Promise<void> {
   if (!db) return;
   try {
-    const { hero, quests, activeFast, fastHistory, noFap, dailyLogs, sprintImpediments, timeClockPortalAccesses } = useStore.getState();
+    const { hero, quests, activeFast, fastHistory, noFap, dailyLogs, sprintImpediments, timeClockPortalAccesses, countdownTimers, sprintAlarms } = useStore.getState();
     const docRef = doc(db, 'users', uid);
     const dataToSave: Record<string, unknown> = { 
       userName: hero.name,
@@ -85,7 +89,9 @@ export async function saveUserData(uid: string, email?: string | null): Promise<
       noFap,
       dailyLogs,
       sprintImpediments,
-      timeClockPortalAccesses
+      timeClockPortalAccesses,
+      countdownTimers,
+      sprintAlarms
     };
     
     if (email) {

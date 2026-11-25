@@ -65,6 +65,23 @@ export interface TimeClockPortalAccess {
   accessedAt: number;
 }
 
+export interface CountdownTimer {
+  id: string;
+  label: string;
+  durationSeconds: number;
+  remainingSeconds: number;
+  endsAt?: number;
+  completed: boolean;
+}
+
+export interface SprintAlarm {
+  id: string;
+  label: string;
+  time: string;
+  enabled: boolean;
+  lastTriggeredDate?: string;
+}
+
 export interface Hero {
   name: string;
   level: number;

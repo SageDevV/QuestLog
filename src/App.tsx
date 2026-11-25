@@ -15,6 +15,7 @@ const DashboardStats = lazy(() => import('./components/DashboardStats'));
 const DailyLog = lazy(() => import('./components/DailyLog'));
 const SprintImpediments = lazy(() => import('./components/SprintImpediments'));
 const TimeClock = lazy(() => import('./components/TimeClock'));
+const ClockTools = lazy(() => import('./components/ClockTools'));
 import LoginScreen from './components/LoginScreen';
 import StartJourneyScreen from './components/StartJourneyScreen';
 import WarningScreen from './components/WarningScreen';
@@ -31,13 +32,15 @@ export default function App() {
   const dailyLogs = useStore(s => s.dailyLogs);
   const sprintImpediments = useStore(s => s.sprintImpediments);
   const timeClockPortalAccesses = useStore(s => s.timeClockPortalAccesses);
+  const countdownTimers = useStore(s => s.countdownTimers);
+  const sprintAlarms = useStore(s => s.sprintAlarms);
   const levelUpMsg = useStore(s => s.levelUpMsg);
   const clearLevelUpMsg = useStore(s => s.clearLevelUpMsg);
   const dayClearMsg = useStore(s => s.dayClearMsg);
   const clearDayClearMsg = useStore(s => s.clearDayClearMsg);
   const undoTodayQuestActions = useStore(s => s.undoTodayQuestActions);
   
-  const [filter, setFilter] = useState<'active' | 'completed' | 'calendar' | 'dashboard' | 'fasting' | 'nofap' | 'dailylog' | 'impediments' | 'timeclock'>('active');
+  const [filter, setFilter] = useState<'active' | 'completed' | 'calendar' | 'dashboard' | 'fasting' | 'nofap' | 'dailylog' | 'impediments' | 'timeclock' | 'clocks'>('active');
   const [dataLoaded, setDataLoaded] = useState(false);
   const [storeHydrated, setStoreHydrated] = useState(false);
   const [hasStartedJourney, setHasStartedJourney] = useState(false);
@@ -107,7 +110,7 @@ export default function App() {
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
-  }, [quests, hero, activeFast, fastHistory, noFap, dailyLogs, sprintImpediments, timeClockPortalAccesses, user, dataLoaded]);
+  }, [quests, hero, activeFast, fastHistory, noFap, dailyLogs, sprintImpediments, timeClockPortalAccesses, countdownTimers, sprintAlarms, user, dataLoaded]);
 
   // Flush pending saves immediately when page becomes hidden or unloads
   useEffect(() => {
@@ -274,7 +277,7 @@ export default function App() {
         {levelUpMsg && <div className="level-up-toast">{levelUpMsg}</div>}
 
         <HeroPanel />
-        {filter !== 'dashboard' && filter !== 'fasting' && filter !== 'nofap' && filter !== 'dailylog' && filter !== 'impediments' && filter !== 'timeclock' && <QuestForm />}
+        {filter !== 'dashboard' && filter !== 'fasting' && filter !== 'nofap' && filter !== 'dailylog' && filter !== 'impediments' && filter !== 'timeclock' && filter !== 'clocks' && <QuestForm />}
 
         <nav className="filter-bar" aria-label="Seções da jornada">
           <button className={filter === 'active' ? 'active' : ''} aria-pressed={filter === 'active'} onClick={() => setFilter('active')}>
@@ -304,6 +307,9 @@ export default function App() {
           <button className={filter === 'timeclock' ? 'active' : ''} aria-pressed={filter === 'timeclock'} onClick={() => setFilter('timeclock')}>
             🕒 Controle de Ponto
           </button>
+          <button className={filter === 'clocks' ? 'active' : ''} aria-pressed={filter === 'clocks'} onClick={() => setFilter('clocks')}>
+            ⏱️ Relógios
+          </button>
         </nav>
 
         <Suspense fallback={<div className="empty-msg">Carregando...</div>}>
@@ -313,6 +319,7 @@ export default function App() {
         {filter === 'dailylog' && <DailyLog />}
         {filter === 'impediments' && <SprintImpediments />}
         {filter === 'timeclock' && <TimeClock />}
+        {filter === 'clocks' && <ClockTools />}
         {filter === 'calendar' && (
           <QuestCalendar 
             quests={quests} 
