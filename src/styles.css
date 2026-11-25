@@ -133,6 +133,22 @@ body {
 .daily-log-entry time { display: block; margin-bottom: 6px; color: #a8fbff; font-family: 'Orbitron', sans-serif; font-size: .68rem; }
 .daily-log-entry p { color: var(--text-dim); font-size: .88rem; line-height: 1.5; white-space: pre-wrap; }
 @media (max-width: 520px) { .daily-log-header { display: grid; } .daily-log-header time { justify-self: start; } .daily-log-actions { align-items: stretch; flex-direction: column; } }
+
+/* Sprint impediments */
+.sprint-impediments { display: grid; gap: 16px; }
+.impediments-header, .impediment-form, .impediment-list { border: 1px solid rgba(255, 61, 129, .2); border-radius: var(--radius); background: rgba(13, 20, 40, .9); }
+.impediments-header { display: flex; justify-content: space-between; gap: 16px; padding: 21px; background: linear-gradient(135deg, rgba(70, 20, 55, .82), rgba(13, 20, 40, .92)); }
+.impediments-kicker { margin-bottom: 7px; color: #ff89b0; font-family: 'Orbitron', sans-serif; font-size: .63rem; letter-spacing: .1em; }
+.impediments-header h2, .impediment-list h3 { color: #ffb0c9; font-family: 'Orbitron', sans-serif; }
+.impediments-header h2 { margin-bottom: 5px; font-size: 1.45rem; }.impediments-header p { color: var(--text-dim); font-size: .88rem; }
+.impediments-counter { height: fit-content; padding: 7px 9px; color: #ffb0c9; border: 1px solid rgba(255, 61, 129, .38); border-radius: 6px; background: rgba(255, 61, 129, .1); font-family: 'Orbitron', sans-serif; font-size: .65rem; white-space: nowrap; }
+.impediment-form { display: grid; gap: 10px; padding: 18px; }.impediment-form label { color: var(--text); font-family: 'Orbitron', sans-serif; font-size: .75rem; }
+.impediment-form input, .impediment-form textarea { width: 100%; padding: 11px 13px; color: var(--text); background: rgba(4, 10, 27, .78); border: 1px solid rgba(255, 255, 255, .1); border-radius: 8px; font: inherit; }.impediment-form textarea { resize: vertical; }.impediment-form input:focus, .impediment-form textarea:focus { outline: none; border-color: #ff3d81; box-shadow: 0 0 0 3px rgba(255, 61, 129, .1); }
+.impediment-form button { justify-self: end; padding: 10px 14px; color: #fff; border: 1px solid #ff3d81; border-radius: 7px; background: #b51f55; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: .67rem; font-weight: 700; }.impediment-form button:hover { box-shadow: 0 0 18px rgba(255, 61, 129, .4); }
+.impediment-list { display: grid; gap: 11px; padding: 18px; }.impediment-list h3 { font-size: .91rem; }.impediment-empty { color: var(--text-dim); font-size: .86rem; }
+.impediment-card { display: flex; justify-content: space-between; gap: 12px; padding: 13px; border-left: 3px solid #ff3d81; background: rgba(255, 61, 129, .055); }.impediment-card-main { min-width: 0; }.impediment-status { color: #ff8db5; font-family: 'Orbitron', sans-serif; font-size: .58rem; letter-spacing: .08em; }.impediment-card h4 { margin: 5px 0; color: var(--text); font-size: .96rem; }.impediment-card p { margin-bottom: 7px; color: var(--text-dim); font-size: .84rem; line-height: 1.45; white-space: pre-wrap; }.impediment-card time { color: #8796bd; font-size: .72rem; }
+.impediment-actions { display: flex; align-items: flex-start; gap: 6px; }.impediment-actions button { padding: 6px 8px; border-radius: 5px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: .62rem; }.resolve-impediment { color: #7effc0; border: 1px solid rgba(74, 222, 128, .45); background: rgba(74, 222, 128, .08); }.reopen-impediment { color: #a8fbff; border: 1px solid rgba(0, 229, 255, .4); background: rgba(0, 229, 255, .08); }.delete-impediment { width: 28px; color: #ff93b8; border: 1px solid rgba(255, 61, 129, .3); background: transparent; font-size: 1rem !important; }.resolved-list { border-color: rgba(74, 222, 128, .17); }.impediment-card.resolved { border-left-color: #4ade80; background: rgba(74, 222, 128, .045); }.impediment-card.resolved .impediment-status { color: #7effc0; }
+@media (max-width: 520px) { .impediments-header, .impediment-card { display: grid; }.impediments-counter { justify-self: start; }.impediment-actions { justify-content: flex-start; } }
 @keyframes stage-clear-overlay-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes stage-clear-panel-in { from { opacity: 0; transform: scaleX(.45) scaleY(.75); filter: brightness(2); } to { opacity: 1; transform: scale(1); filter: brightness(1); } }
 @keyframes stage-clear-beam { from { opacity: 0; transform: scaleX(0); } 45% { opacity: 1; } to { opacity: .12; transform: scaleX(2.5); } }

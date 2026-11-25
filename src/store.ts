@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Quest, Hero, ActiveFast, FastRecord, NoFapState, DailyLogEntry, DIFFICULTY_CONFIG, getTitle } from './types';
+import { Quest, Hero, ActiveFast, FastRecord, NoFapState, DailyLogEntry, SprintImpediment, DIFFICULTY_CONFIG, getTitle } from './types';
 import { MAX_HISTORY } from './fastingUtils';
 import { getNoFapDays } from './noFapUtils';
 
@@ -18,6 +18,7 @@ interface AppState {
   fastHistory: FastRecord[];
   noFap: NoFapState | null;
   dailyLogs: DailyLogEntry[];
+  sprintImpediments: SprintImpediment[];
 
   // Actions
   startNoFap: () => void;
@@ -27,6 +28,9 @@ interface AppState {
   updateFast: (updates: Partial<ActiveFast>) => void;
   endFast: () => void;
   saveDailyLog: (date: string, content: string) => void;
+  addSprintImpediment: (title: string, details: string) => void;
+  toggleSprintImpediment: (id: string) => void;
+  deleteSprintImpediment: (id: string) => void;
   setHeroName: (name: string) => void;
   resetHero: () => void;
   addQuest: (q: Quest | Quest[]) => void;
@@ -54,6 +58,7 @@ export const useStore = create<AppState>()(
       fastHistory: [],
       noFap: null,
       dailyLogs: [],
+      sprintImpediments: [],
       dayClearMsg: '',
       undoToastQuestId: null,
 
@@ -105,6 +110,29 @@ export const useStore = create<AppState>()(
             : [entry, ...s.dailyLogs],
         };
       }),
+
+      addSprintImpediment: (title, details) => set((s) => {
+        const normalizedTitle = title.trim();
+        if (!normalizedTitle) return s;
+        const impediment: SprintImpediment = {
+          id: crypto.randomUUID(),
+          title: normalizedTitle,
+          details: details.trim(),
+          resolved: false,
+          createdAt: Date.now(),
+        };
+        return { sprintImpediments: [impediment, ...s.sprintImpediments] };
+      }),
+
+      toggleSprintImpediment: (id) => set((s) => ({
+        sprintImpediments: s.sprintImpediments.map(item => item.id === id
+          ? { ...item, resolved: !item.resolved, resolvedAt: item.resolved ? undefined : Date.now() }
+          : item),
+      })),
+
+      deleteSprintImpediment: (id) => set((s) => ({
+        sprintImpediments: s.sprintImpediments.filter(item => item.id !== id),
+      })),
 
       setHeroName: (name) => set((s) => ({ hero: { ...s.hero, name } })),
       resetHero: () => set((s) => ({ 

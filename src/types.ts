@@ -51,6 +51,15 @@ export interface DailyLogEntry {
   updatedAt: number;
 }
 
+export interface SprintImpediment {
+  id: string;
+  title: string;
+  details: string;
+  resolved: boolean;
+  createdAt: number;
+  resolvedAt?: number;
+}
+
 export interface Hero {
   name: string;
   level: number;
