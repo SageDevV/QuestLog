@@ -666,3 +666,64 @@ body::before {
   .quest-card { padding: 16px; }
   .login-card { padding: 36px 24px; }
 }
+
+/* Shared spacing for the command center and its tools. */
+.app {
+  --section-gap: clamp(20px, 3vw, 28px);
+  --panel-padding: clamp(16px, 3vw, 24px);
+  --field-gap: 14px;
+  --action-gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+}
+
+.app > :is(header, section, nav, div, button, form) {
+  margin-block: 0;
+  min-width: 0;
+}
+
+.app .filter-bar {
+  grid-template-columns: repeat(auto-fit, minmax(min(130px, 100%), 1fr));
+  gap: var(--action-gap);
+  padding: 10px;
+}
+
+.app .filter-bar button {
+  min-height: 44px;
+  padding-inline: 8px;
+}
+
+:is(.daily-log, .sprint-impediments, .time-clock, .clock-tools, .fasting, .clock-tools-grid, .quest-list) {
+  gap: var(--section-gap);
+}
+
+:is(.daily-log-editor, .daily-log-history, .impediment-form, .impediment-list,
+    .time-clock-history, .time-clock-schedule, .clock-panel, .quest-form, .fasting-card) {
+  padding: var(--panel-padding);
+}
+
+:is(.quest-form, .calendar-quick-edit, .daily-log-editor, .daily-log-history,
+    .impediment-form, .impediment-list, .time-clock-history, .clock-create-form, .clock-item-list) {
+  gap: var(--field-gap);
+}
+
+.quick-edit-desc {
+  display: grid;
+  gap: var(--field-gap);
+}
+
+:is(.quest-actions, .quick-edit-actions, .impediment-actions, .timer-actions,
+    .day-panel-actions, .fasting-actions, .stopwatch-actions) {
+  flex-wrap: wrap;
+  gap: var(--action-gap);
+}
+
+.day-panel-quest { flex-wrap: wrap; }
+.timer-item, .alarm-item { flex-wrap: wrap; row-gap: var(--field-gap); }
+.day-panel-quest-title, .impediment-card h4, .daily-log-entry p { overflow-wrap: anywhere; }
+
+@media (max-width: 520px) {
+  .app .filter-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .app :is(.timer-actions, .day-panel-actions, .impediment-actions) button { min-height: 38px; min-width: 38px; }
+}
