@@ -575,21 +575,20 @@ body {
   flex: 0 0 auto;
   min-width: 36px;
   min-height: 36px;
-  color: #a7f4ff;
-  background: #123447;
-  border: 1px solid #438496;
+  color: var(--text-dim);
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 16px;
   padding: 6px;
   line-height: 1;
 }
 
 .edit-icon-btn:hover,
 .edit-icon-btn:focus-visible {
-  color: white;
-  background: #185065;
-  border-color: #8eedff;
+  color: #a7e0ec;
+  background: rgba(97, 190, 210, 0.08);
 }
 
 .edit-icon-btn:focus-visible {
