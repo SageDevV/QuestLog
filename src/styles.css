@@ -109,6 +109,30 @@ body {
 .stage-clear-undo:hover { background: #ff3d81; color: #130711; box-shadow: 0 0 17px rgba(255, 61, 129, .5); }
 .day-undo-btn { width: 100%; margin: 0 0 14px; padding: 11px 14px; border: 1px solid rgba(255, 61, 129, .42); border-radius: 8px; background: rgba(255, 61, 129, .08); color: #ff9cbc; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: .72rem; font-weight: 600; letter-spacing: .04em; transition: all .2s; }
 .day-undo-btn:hover { border-color: #ff3d81; background: rgba(255, 61, 129, .17); box-shadow: 0 0 16px rgba(255, 61, 129, .2); }
+
+/* Daily sprint log */
+.daily-log { display: grid; gap: 16px; }
+.daily-log-header, .daily-log-editor, .daily-log-history { background: rgba(13, 20, 40, .88); border: 1px solid rgba(0, 229, 255, .17); border-radius: var(--radius); }
+.daily-log-header { display: flex; justify-content: space-between; gap: 16px; padding: 21px; background: linear-gradient(135deg, rgba(16, 51, 78, .95), rgba(13, 20, 40, .9)); }
+.daily-log-kicker { margin-bottom: 7px; color: var(--accent); font-family: 'Orbitron', sans-serif; font-size: .63rem; letter-spacing: .1em; }
+.daily-log-header h2, .daily-log-history h3 { font-family: 'Orbitron', sans-serif; color: var(--gold); }
+.daily-log-header h2 { font-size: 1.45rem; margin-bottom: 5px; }
+.daily-log-header p { color: var(--text-dim); font-size: .88rem; }
+.daily-log-header time { height: fit-content; padding: 7px 9px; color: #a8fbff; background: rgba(0, 229, 255, .09); border: 1px solid rgba(0, 229, 255, .2); border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: .64rem; text-align: center; }
+.daily-log-editor { display: grid; gap: 10px; padding: 18px; }
+.daily-log-editor label { color: var(--text); font-family: 'Orbitron', sans-serif; font-size: .75rem; letter-spacing: .04em; }
+.daily-log-editor textarea { width: 100%; resize: vertical; padding: 13px; color: var(--text); background: rgba(4, 10, 27, .78); border: 1px solid rgba(255, 255, 255, .1); border-radius: 8px; font: inherit; line-height: 1.55; }
+.daily-log-editor textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(34, 228, 255, .1); }
+.daily-log-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--text-dim); font-size: .78rem; }
+.daily-log-actions button { padding: 10px 14px; border: 1px solid var(--gold); border-radius: 7px; color: #07111d; background: var(--gold); cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: .68rem; font-weight: 700; }
+.daily-log-actions button:hover { box-shadow: 0 0 18px rgba(34, 228, 255, .42); }
+.daily-log-history { display: grid; gap: 12px; padding: 18px; }
+.daily-log-history h3 { font-size: .92rem; }
+.daily-log-empty { color: var(--text-dim); font-size: .86rem; }
+.daily-log-entry { padding: 12px; border-left: 2px solid var(--accent); background: rgba(255, 255, 255, .025); }
+.daily-log-entry time { display: block; margin-bottom: 6px; color: #a8fbff; font-family: 'Orbitron', sans-serif; font-size: .68rem; }
+.daily-log-entry p { color: var(--text-dim); font-size: .88rem; line-height: 1.5; white-space: pre-wrap; }
+@media (max-width: 520px) { .daily-log-header { display: grid; } .daily-log-header time { justify-self: start; } .daily-log-actions { align-items: stretch; flex-direction: column; } }
 @keyframes stage-clear-overlay-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes stage-clear-panel-in { from { opacity: 0; transform: scaleX(.45) scaleY(.75); filter: brightness(2); } to { opacity: 1; transform: scale(1); filter: brightness(1); } }
 @keyframes stage-clear-beam { from { opacity: 0; transform: scaleX(0); } 45% { opacity: 1; } to { opacity: .12; transform: scaleX(2.5); } }

@@ -1,7 +1,7 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { useStore } from './store';
-import type { Quest, Hero, ActiveFast, FastRecord, NoFapState } from './types';
+import type { Quest, Hero, ActiveFast, FastRecord, NoFapState, DailyLogEntry } from './types';
 
 interface UserData {
   userName?: string;
@@ -12,6 +12,7 @@ interface UserData {
   activeFast?: ActiveFast | null;
   fastHistory?: FastRecord[];
   noFap?: NoFapState | null;
+  dailyLogs?: DailyLogEntry[];
 }
 
 /**
@@ -53,6 +54,7 @@ export async function loadUserData(uid: string, email?: string | null): Promise<
         activeFast: data.activeFast !== undefined ? data.activeFast : localState.activeFast,
         fastHistory: data.fastHistory ?? localState.fastHistory,
         noFap: data.noFap !== undefined ? data.noFap : localState.noFap,
+        dailyLogs: data.dailyLogs ?? localState.dailyLogs,
       });
     } else {
       // First login: migrate current localStorage data to Firestore
@@ -67,7 +69,7 @@ export async function loadUserData(uid: string, email?: string | null): Promise<
 export async function saveUserData(uid: string, email?: string | null): Promise<void> {
   if (!db) return;
   try {
-    const { hero, quests, activeFast, fastHistory, noFap } = useStore.getState();
+    const { hero, quests, activeFast, fastHistory, noFap, dailyLogs } = useStore.getState();
     const docRef = doc(db, 'users', uid);
     const dataToSave: Record<string, unknown> = { 
       userName: hero.name,
@@ -76,7 +78,8 @@ export async function saveUserData(uid: string, email?: string | null): Promise<
       quests,
       activeFast,
       fastHistory,
-      noFap
+      noFap,
+      dailyLogs
     };
     
     if (email) {

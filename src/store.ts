@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Quest, Hero, ActiveFast, FastRecord, NoFapState, DIFFICULTY_CONFIG, getTitle } from './types';
+import { Quest, Hero, ActiveFast, FastRecord, NoFapState, DailyLogEntry, DIFFICULTY_CONFIG, getTitle } from './types';
 import { MAX_HISTORY } from './fastingUtils';
 import { getNoFapDays } from './noFapUtils';
 
@@ -17,6 +17,7 @@ interface AppState {
   activeFast: ActiveFast | null;
   fastHistory: FastRecord[];
   noFap: NoFapState | null;
+  dailyLogs: DailyLogEntry[];
 
   // Actions
   startNoFap: () => void;
@@ -25,6 +26,7 @@ interface AppState {
   startFast: (protocolId: string, targetHours: number) => void;
   updateFast: (updates: Partial<ActiveFast>) => void;
   endFast: () => void;
+  saveDailyLog: (date: string, content: string) => void;
   setHeroName: (name: string) => void;
   resetHero: () => void;
   addQuest: (q: Quest | Quest[]) => void;
@@ -51,6 +53,7 @@ export const useStore = create<AppState>()(
       activeFast: null,
       fastHistory: [],
       noFap: null,
+      dailyLogs: [],
       dayClearMsg: '',
       undoToastQuestId: null,
 
@@ -83,6 +86,25 @@ export const useStore = create<AppState>()(
       ),
 
       setUndoToastQuestId: (id) => set({ undoToastQuestId: id }),
+
+      saveDailyLog: (date, content) => set((s) => {
+        const normalizedContent = content.trim();
+        const existing = s.dailyLogs.find(entry => entry.date === date);
+        if (!normalizedContent) {
+          return existing ? { dailyLogs: s.dailyLogs.filter(entry => entry.date !== date) } : s;
+        }
+        const entry: DailyLogEntry = {
+          id: existing?.id ?? `daily-log-${date}`,
+          date,
+          content: normalizedContent,
+          updatedAt: Date.now(),
+        };
+        return {
+          dailyLogs: existing
+            ? s.dailyLogs.map(current => current.date === date ? entry : current)
+            : [entry, ...s.dailyLogs],
+        };
+      }),
 
       setHeroName: (name) => set((s) => ({ hero: { ...s.hero, name } })),
       resetHero: () => set((s) => ({ 

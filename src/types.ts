@@ -44,6 +44,13 @@ export interface ChecklistItem {
   completed: boolean;
 }
 
+export interface DailyLogEntry {
+  id: string;
+  date: string;
+  content: string;
+  updatedAt: number;
+}
+
 export interface Hero {
   name: string;
   level: number;
