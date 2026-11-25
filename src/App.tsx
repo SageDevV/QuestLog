@@ -16,11 +16,7 @@ import LoginScreen from './components/LoginScreen';
 import StartJourneyScreen from './components/StartJourneyScreen';
 import WarningScreen from './components/WarningScreen';
 import missionClearSrc from './music_mission_clear.mp3';
-import type confetti from 'canvas-confetti';
 import { bgSuspend, bgResume } from './bgAudio';
-
-const fireConfetti = (opts: confetti.Options) =>
-  import('canvas-confetti').then(m => m.default(opts));
 
 export default function App() {
   const { user, loading } = useAuth();
@@ -132,24 +128,6 @@ export default function App() {
     };
   }, [user]);
 
-  const prevQuestsCompleted = useRef(hero.questsCompleted);
-  const isInitialMount = useRef(true);
-
-  // Trigger confetti per quest automatically
-  useEffect(() => {
-    if (!dataLoaded) return;
-
-    if (!isInitialMount.current && hero.questsCompleted > prevQuestsCompleted.current) {
-      fireConfetti({ particleCount: 80, spread: 60, origin: { y: 0.8 }, zIndex: 10000 });
-    }
-    
-    if (isInitialMount.current && dataLoaded) {
-      isInitialMount.current = false;
-    }
-    
-    prevQuestsCompleted.current = hero.questsCompleted;
-  }, [hero.questsCompleted, dataLoaded]);
-
   // Trigger mega Level Up Fanfare
   useEffect(() => {
     if (levelUpMsg) {
@@ -159,18 +137,8 @@ export default function App() {
       audio.play().catch(() => {});
       audio.onended = () => { bgResume(); }
 
-      // Optimize confetti: fire 4 bursts instead of a heavy CPU loop
-      let burstCount = 0;
-      const interval = setInterval(() => {
-        fireConfetti({ particleCount: 50, angle: 60, spread: 80, origin: { x: 0, y: 0.7 }, colors: ['#e94560', '#facc15'], zIndex: 10000 });
-        fireConfetti({ particleCount: 50, angle: 120, spread: 80, origin: { x: 1, y: 0.7 }, colors: ['#00e5ff', '#ffffff'], zIndex: 10000 });
-        burstCount++;
-        if (burstCount >= 4) clearInterval(interval);
-      }, 500);
-
-      setTimeout(clearLevelUpMsg, 3500);
-      
-      return () => clearInterval(interval);
+      const timer = setTimeout(clearLevelUpMsg, 3500);
+      return () => clearTimeout(timer);
     }
   }, [levelUpMsg, clearLevelUpMsg]);
 
@@ -183,19 +151,12 @@ export default function App() {
       audio.play().catch(() => {});
       audio.onended = () => { bgResume(); }
 
-      let burstCount = 0;
-      const interval = setInterval(() => {
-        fireConfetti({ particleCount: 26, angle: 58, spread: 38, startVelocity: 38, gravity: 0.72, origin: { x: 0.18, y: 0.78 }, colors: ['#00e5ff', '#ffffff', '#8b5cf6'], zIndex: 10000 });
-        fireConfetti({ particleCount: 26, angle: 122, spread: 38, startVelocity: 38, gravity: 0.72, origin: { x: 0.82, y: 0.78 }, colors: ['#00e5ff', '#ffffff', '#ff3d81'], zIndex: 10000 });
-        burstCount++;
-        if (burstCount >= 4) clearInterval(interval);
-      }, 420);
-
-      setTimeout(clearDayClearMsg, 4300);
-      return () => clearInterval(interval);
+      const timer = setTimeout(clearDayClearMsg, 4300);
+      return () => clearTimeout(timer);
     } else if (dayClearMsg && levelUpMsg) {
       // If both happen, clear level up will handle the music, just clear day message after some time
-      setTimeout(clearDayClearMsg, 4300);
+      const timer = setTimeout(clearDayClearMsg, 4300);
+      return () => clearTimeout(timer);
     }
   }, [dayClearMsg, levelUpMsg, clearDayClearMsg]);
 
