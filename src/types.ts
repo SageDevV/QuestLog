@@ -27,6 +27,7 @@ export interface Quest {
   completedAt?: number;
   scheduledDate: number;
   recurrenceType?: RecurrenceType;
+  recurrenceGroupId?: string;
   progress?: number;
   checklist?: ChecklistItem[];
   // Maverick Hunter — Autonomous execution metadata

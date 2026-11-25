@@ -51,6 +51,7 @@ interface AppState {
   deleteAllMatching: (id: string) => void;
   updateQuest: (id: string, updates: Partial<Quest>) => void;
   updateAllMatching: (id: string, updates: Partial<Quest>) => void;
+  rescheduleQuest: (id: string, scheduledDate: number, applyToSeries?: boolean) => void;
   completeQuestAction: (id: string) => { leveledUp: boolean, isAllDayDone: boolean };
   undoCompleteQuestAction: (id: string) => void;
   undoTodayQuestActions: () => void;
@@ -242,6 +243,24 @@ export const useStore = create<AppState>()(
                 !q.completed; 
               return isMatch ? { ...q, ...updates } : q;
             })
+          };
+        });
+      },
+
+      rescheduleQuest: (id, scheduledDate, applyToSeries = false) => {
+        set((s) => {
+          const target = s.quests.find(q => q.id === id);
+          if (!target) return s;
+          const isRecurring = (target.recurrenceType || 'single') !== 'single';
+          if (!applyToSeries || !isRecurring) {
+            return { quests: s.quests.map(q => q.id === id ? { ...q, scheduledDate } : q) };
+          }
+          const delta = scheduledDate - target.scheduledDate;
+          const isSameSeries = (q: Quest) => target.recurrenceGroupId
+            ? q.recurrenceGroupId === target.recurrenceGroupId
+            : q.title === target.title && q.difficulty === target.difficulty && (q.recurrenceType || 'single') === (target.recurrenceType || 'single');
+          return {
+            quests: s.quests.map(q => isSameSeries(q) && !q.completed ? { ...q, scheduledDate: q.scheduledDate + delta } : q),
           };
         });
       },

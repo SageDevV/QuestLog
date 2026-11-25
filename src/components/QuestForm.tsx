@@ -12,6 +12,7 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
   const addQuest = useStore(s => s.addQuest);
   const updateQuest = useStore(s => s.updateQuest);
   const updateAllMatching = useStore(s => s.updateAllMatching);
+  const rescheduleQuest = useStore(s => s.rescheduleQuest);
 
   const [title, setTitle] = useState(initialQuest?.title || '');
   const [description, setDescription] = useState(initialQuest?.description || '');
@@ -39,9 +40,11 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (initialQuest) {
-      const updates = { title: title.trim(), description: description.trim(), difficulty, tag, agentLabel, checklist, scheduledDate: new Date(scheduledDate + 'T12:00:00').getTime() };
+      const newScheduledDate = new Date(scheduledDate + 'T12:00:00').getTime();
+      const updates = { title: title.trim(), description: description.trim(), difficulty, tag, agentLabel, checklist };
       if (applyToAll) updateAllMatching(initialQuest.id, updates);
       else updateQuest(initialQuest.id, updates);
+      rescheduleQuest(initialQuest.id, newScheduledDate, applyToAll);
       if (onCancel) onCancel();
       return;
     }
@@ -59,8 +62,10 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
     if (error) { setFormError(error); return; }
 
     const timestamps = generateOccurrences(config);
+    const recurrenceGroupId = recurrenceType !== 'single' ? crypto.randomUUID() : undefined;
     const quests: Quest[] = timestamps.map(ts => ({
       id: crypto.randomUUID(), title: title.trim(), description: description.trim(), difficulty, tag, agentLabel, completed: false, createdAt: Date.now(), scheduledDate: ts, recurrenceType,
+      recurrenceGroupId,
       checklist: checklist.map(item => ({ ...item, id: crypto.randomUUID(), completed: false }))
     }));
 
@@ -97,7 +102,7 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
       <div className="recurrence-selector">
         {RECURRENCE_OPTIONS.map(opt => ( <button key={opt.type} type="button" className={`recurrence-btn ${recurrenceType === opt.type ? 'selected' : ''}`} onClick={() => setRecurrenceType(opt.type)}>{opt.label}</button> ))}
       </div>
-      {recurrenceType === 'single' && <input type="date" value={scheduledDate} onChange={e => setScheduledDate(e.target.value)} />}
+      {(recurrenceType === 'single' || initialQuest) && <input type="date" value={scheduledDate} onChange={e => setScheduledDate(e.target.value)} />}
       
       {recurrenceType === 'weekly' && (
         <div className="weekday-selector">

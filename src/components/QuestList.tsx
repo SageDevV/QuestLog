@@ -9,6 +9,7 @@ export default function QuestList({ quests, highlightHard }: Props) {
   const deleteQuest = useStore(s => s.deleteQuest);
   const deleteAllMatching = useStore(s => s.deleteAllMatching);
   const updateQuest = useStore(s => s.updateQuest);
+  const rescheduleQuest = useStore(s => s.rescheduleQuest);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempTitle, setTempTitle] = useState('');
@@ -17,6 +18,8 @@ export default function QuestList({ quests, highlightHard }: Props) {
   const [tempAgent, setTempAgent] = useState<QuestAgent | undefined>(undefined);
   const [tempChecklist, setTempChecklist] = useState<ChecklistItem[]>([]);
   const [newChecklistItem, setNewChecklistItem] = useState('');
+  const [tempScheduledDate, setTempScheduledDate] = useState('');
+  const [applyDateToSeries, setApplyDateToSeries] = useState(false);
 
   if (quests.length === 0) return <div className="empty-msg">Nenhum rastro encontrado... O horizonte está limpo e sereno! 🗺️</div>;
 
@@ -28,10 +31,14 @@ export default function QuestList({ quests, highlightHard }: Props) {
     setTempAgent(quest.agentLabel);
     setTempChecklist(quest.checklist || []);
     setNewChecklistItem('');
+    const date = new Date(quest.scheduledDate);
+    setTempScheduledDate(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`);
+    setApplyDateToSeries(false);
   };
 
   const handleSave = (id: string) => {
     updateQuest(id, { title: tempTitle, description: tempDesc, progress: tempProgress, agentLabel: tempAgent, checklist: tempChecklist });
+    if (tempScheduledDate) rescheduleQuest(id, new Date(`${tempScheduledDate}T12:00:00`).getTime(), applyDateToSeries);
     setEditingId(null);
   };
 
@@ -43,6 +50,8 @@ export default function QuestList({ quests, highlightHard }: Props) {
     setTempAgent(undefined);
     setTempChecklist([]);
     setNewChecklistItem('');
+    setTempScheduledDate('');
+    setApplyDateToSeries(false);
   };
 
   const addTemporaryChecklistItem = () => {
@@ -113,6 +122,10 @@ export default function QuestList({ quests, highlightHard }: Props) {
                     className="quick-edit-title-input"
                     autoFocus
                   />
+                  <div className="schedule-edit-area">
+                    <label>Data da missão <input type="date" value={tempScheduledDate} onChange={e => setTempScheduledDate(e.target.value)} /></label>
+                    {isRecurrent && <label className="schedule-series-toggle"><input type="checkbox" checked={applyDateToSeries} onChange={e => setApplyDateToSeries(e.target.checked)} /> Reagendar todas as ocorrências pendentes</label>}
+                  </div>
                   
                   <div className="progress-edit-area">
                     <label>Progresso: {tempProgress}%</label>
