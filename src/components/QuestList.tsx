@@ -103,7 +103,7 @@ export default function QuestList({ quests, highlightHard }: Props) {
             <h3 style={{display:'flex', alignItems:'center', gap:'8px'}}>
               {quest.title} {isRecurrent && <span title="Missão Recorrente" style={{fontSize:'0.9rem', opacity:0.5}}><HudIcon name="repeat" /></span>}
               {!quest.completed && !isEditing && (
-                <button className="edit-icon-btn" onClick={() => handleStartEdit(quest)} title={quest.description ? 'Editar Descrição' : 'Adicionar Descrição'}>
+                <button className="edit-icon-btn" onClick={() => handleStartEdit(quest)} title="Editar missão" aria-label={`Editar missão: ${quest.title}`}>
                   <HudIcon name="edit" />
                 </button>
               )}

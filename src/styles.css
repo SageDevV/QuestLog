@@ -570,19 +570,38 @@ body {
 .quest-checklist-item.done span { color: var(--text-dim); text-decoration: line-through; }
 
 .edit-icon-btn {
-  background: transparent;
-  border: none;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  min-width: 36px;
+  min-height: 36px;
+  color: #a7f4ff;
+  background: #123447;
+  border: 1px solid #438496;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 0.85rem;
-  padding: 2px 4px;
-  opacity: 0.4;
-  transition: opacity 0.2s, transform 0.2s;
+  font-size: 20px;
+  padding: 6px;
   line-height: 1;
 }
 
-.edit-icon-btn:hover {
-  opacity: 1;
-  transform: scale(1.2);
+.edit-icon-btn:hover,
+.edit-icon-btn:focus-visible {
+  color: white;
+  background: #185065;
+  border-color: #8eedff;
+}
+
+.edit-icon-btn:focus-visible {
+  outline: 2px solid #8eedff;
+  outline-offset: 2px;
+}
+
+@media (pointer: coarse) {
+  .app .edit-icon-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
 }
 
 .edit-desc-link {
