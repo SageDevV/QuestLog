@@ -34,6 +34,7 @@ interface AppState {
   updateAllMatching: (id: string, updates: Partial<Quest>) => void;
   completeQuestAction: (id: string) => { leveledUp: boolean, isAllDayDone: boolean };
   undoCompleteQuestAction: (id: string) => void;
+  undoTodayQuestActions: () => void;
   clearLevelUpMsg: () => void;
   dayClearMsg: string;
   clearDayClearMsg: () => void;
@@ -221,6 +222,53 @@ export const useStore = create<AppState>()(
         const newQuests = state.quests.map(q => q.id === id ? { ...q, completed: false, completedAt: undefined } : q);
         
         set({ hero: newHero, quests: newQuests, dayClearMsg: '', undoToastQuestId: null });
+      },
+
+      undoTodayQuestActions: () => {
+        const state = get();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayStart = today.getTime();
+        const todayEnd = todayStart + 86400000;
+        const completedToday = state.quests
+          .filter(q => q.completed && q.scheduledDate >= todayStart && q.scheduledDate < todayEnd)
+          .sort((a, b) => (b.completedAt ?? 0) - (a.completedAt ?? 0));
+
+        if (completedToday.length === 0) return;
+
+        const newHero = { ...state.hero };
+        for (const quest of completedToday) {
+          const config = DIFFICULTY_CONFIG[quest.difficulty];
+          newHero.xp -= config.xp;
+          newHero.gold -= config.gold;
+          newHero.questsCompleted--;
+
+          while (newHero.xp < 0 && newHero.level > 1) {
+            newHero.level--;
+            newHero.xpToNext = Math.ceil(newHero.xpToNext / 1.3);
+            newHero.xp += newHero.xpToNext;
+          }
+        }
+
+        newHero.xp = Math.max(0, newHero.xp);
+        newHero.gold = Math.max(0, newHero.gold);
+        newHero.questsCompleted = Math.max(0, newHero.questsCompleted);
+        newHero.title = getTitle(newHero.level);
+
+        const newQuests = state.quests.map(q =>
+          completedToday.some(completedQuest => completedQuest.id === q.id)
+            ? { ...q, completed: false, completedAt: undefined }
+            : q
+        );
+        const hasOtherCompletionToday = newQuests.some(q => q.completedAt && q.completedAt >= todayStart && q.completedAt < todayEnd);
+        if (!hasOtherCompletionToday && newHero.streakLastDate === todayStart) {
+          const yesterday = new Date(todayStart);
+          yesterday.setDate(yesterday.getDate() - 1);
+          newHero.streak = Math.max(0, (newHero.streak ?? 1) - 1);
+          newHero.streakLastDate = newHero.streak > 0 ? yesterday.getTime() : undefined;
+        }
+
+        set({ hero: newHero, quests: newQuests, levelUpMsg: '', dayClearMsg: '', undoToastQuestId: null });
       },
 
       clearLevelUpMsg: () => set({ levelUpMsg: '' }),

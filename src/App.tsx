@@ -33,6 +33,7 @@ export default function App() {
   const clearLevelUpMsg = useStore(s => s.clearLevelUpMsg);
   const dayClearMsg = useStore(s => s.dayClearMsg);
   const clearDayClearMsg = useStore(s => s.clearDayClearMsg);
+  const undoTodayQuestActions = useStore(s => s.undoTodayQuestActions);
   
   const [filter, setFilter] = useState<'active' | 'completed' | 'calendar' | 'dashboard' | 'fasting' | 'nofap'>('active');
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -229,6 +230,14 @@ export default function App() {
     };
   }, [quests]);
 
+  const completedTodayCount = useMemo(() => {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayTs = todayStart.getTime();
+    const todayEnd = todayTs + 86400000;
+    return quests.filter(q => q.completed && q.scheduledDate >= todayTs && q.scheduledDate < todayEnd).length;
+  }, [quests]);
+
   // Loading state
   if (loading) {
     return (
@@ -276,6 +285,7 @@ export default function App() {
             <div className="stage-clear-energy" aria-hidden="true"><i /><i /><i /><i /><i /></div>
             <p className="stage-clear-message">SETOR DO DIA NEUTRALIZADO</p>
             <div className="stage-clear-readout"><span>RANK <b>S</b></span><span>ALL OBJECTIVES COMPLETE</span></div>
+            <button type="button" className="stage-clear-undo" onClick={undoTodayQuestActions}>↶ DESFAZER CONCLUSÕES DE HOJE</button>
           </div>
         </div>
       )}
@@ -353,7 +363,12 @@ export default function App() {
           </>
         )}
         
-        {filter === 'completed' && <QuestList quests={filtered} />}
+        {filter === 'completed' && (
+          <>
+            {completedTodayCount > 0 && <button type="button" className="day-undo-btn" onClick={undoTodayQuestActions}>↶ Reabrir {completedTodayCount} {completedTodayCount > 1 ? 'missões' : 'missão'} de hoje</button>}
+            <QuestList quests={filtered} />
+          </>
+        )}
         
         {undoToastQuestId && (
           <div className="undo-toast">
