@@ -1,3 +1,4 @@
+import HudIcon from './HudIcon';
 import { useState } from 'react';
 import { useStore } from '../store';
 import { useAuth } from '../AuthContext';
@@ -26,7 +27,7 @@ export default function HeroPanel() {
           </div>
           <div style={{ display: 'flex', gap: '10px' }}>
             <button className="logout-btn" onClick={signOut} title="Sair da conta">
-              🚪 Sair
+              <HudIcon name="exit" /> Sair
             </button>
           </div>
         </div>
@@ -41,7 +42,7 @@ export default function HeroPanel() {
           </div>
         ) : (
           <h2 onClick={() => { setTempName(hero.name); setEditing(true); }} title="Clique para renomear">
-            {hero.name} <span className="hero-title">{hero.title}</span>
+            {hero.name} <span className="hero-title">{hero.title.replace(/^\p{Extended_Pictographic}\uFE0F?\s*/u, '')}</span>
           </h2>
         )}
         <span className="hero-level">Nível {hero.level}</span>
@@ -54,8 +55,8 @@ export default function HeroPanel() {
       </div>
 
       <div className="hero-stats">
-        <span>⚡ {hero.gold} Gold</span>
-        <span>✅ {hero.questsCompleted} Missões</span>
+        <span><HudIcon name="bolt" /> {hero.gold} Gold</span>
+        <span><HudIcon name="check" /> {hero.questsCompleted} Missões</span>
         <button className="reset-btn" onClick={() => { if (confirm('Zerar seu progresso e golds? (Missões concluídas serão apagadas, pendentes serão mantidas)')) resetHero(); }}>Resetar Vida</button>
       </div>
     </div>

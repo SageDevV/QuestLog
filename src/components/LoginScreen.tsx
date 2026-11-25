@@ -1,3 +1,4 @@
+import HudIcon from './HudIcon';
 import { useAuth } from '../AuthContext';
 import { unlockWarningAudio } from './WarningScreen';
 
@@ -23,7 +24,7 @@ export default function LoginScreen() {
 
       <div className="login-card">
         <div className="login-logo">
-          <span className="login-logo-icon">⚔️</span>
+          <span className="login-logo-icon"><HudIcon name="crest" /></span>
           <h1 className="login-title">MissionLog</h1>
           <p className="login-subtitle">Gerencie suas missões como um verdadeiro herói</p>
         </div>
@@ -34,7 +35,7 @@ export default function LoginScreen() {
 
         {configError && (
           <div style={{ background: 'rgba(233,69,96,0.15)', border: '1px solid #e94560', color: '#ffb3c0', padding: '12px 14px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.85rem', lineHeight: 1.5 }}>
-            ⚠️ {configError}
+            <HudIcon name="alert" /> {configError}
           </div>
         )}
 
@@ -49,7 +50,7 @@ export default function LoginScreen() {
         </button>
 
         <p className="login-footer">
-          🔒 Login seguro via Google • Seus dados ficam protegidos na nuvem
+          <HudIcon name="lock" /> Login seguro via Google • Seus dados ficam protegidos na nuvem
         </p>
       </div>
     </div>

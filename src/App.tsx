@@ -1,3 +1,4 @@
+import HudIcon from './components/HudIcon';
 import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
 import { useStore } from './store';
 import { useAuth } from './AuthContext';
@@ -214,7 +215,7 @@ export default function App() {
       <div className="login-screen">
         <div className="login-card" style={{ textAlign: 'center' }}>
           <div className="login-logo">
-            <span className="login-logo-icon">⚔️</span>
+            <span className="login-logo-icon"><HudIcon name="crest" /></span>
             <h1 className="login-title">MissionLog</h1>
             <p className="login-subtitle">Carregando...</p>
           </div>
@@ -265,7 +266,7 @@ export default function App() {
       <div className="app" style={{ zIndex:10 }}>
         <header className="app-header">
           <div className="app-brand">
-            <span className="app-brand-icon" aria-hidden="true">✦</span>
+            <span className="app-brand-icon" aria-hidden="true"><HudIcon name="crest" /></span>
             <div>
               <p className="app-eyebrow">Seu centro de comando</p>
               <h1 className="app-title">MissionLog</h1>
@@ -274,41 +275,41 @@ export default function App() {
           <span className="app-status"><span aria-hidden="true" /> Jornada em andamento</span>
         </header>
 
-        {levelUpMsg && <div className="level-up-toast">{levelUpMsg}</div>}
+        {levelUpMsg && <div className="level-up-toast"><HudIcon name="bolt" /> {levelUpMsg.replace(/^⚡\s*/, '')}</div>}
 
         <HeroPanel />
         {filter !== 'dashboard' && filter !== 'fasting' && filter !== 'nofap' && filter !== 'dailylog' && filter !== 'impediments' && filter !== 'timeclock' && filter !== 'clocks' && <QuestForm />}
 
         <nav className="filter-bar" aria-label="Seções da jornada">
           <button className={filter === 'active' ? 'active' : ''} aria-pressed={filter === 'active'} onClick={() => setFilter('active')}>
-            📋 Ativas ({quests.filter(q => !q.completed).length})
+            <HudIcon name="missions" /> Ativas ({quests.filter(q => !q.completed).length})
           </button>
           <button className={filter === 'completed' ? 'active' : ''} aria-pressed={filter === 'completed'} onClick={() => setFilter('completed')}>
-            ✅ Completas
+            <HudIcon name="check" /> Completas
           </button>
           <button className={filter === 'calendar' ? 'active' : ''} aria-pressed={filter === 'calendar'} onClick={() => setFilter('calendar')}>
-            📅 Calendário
+            <HudIcon name="calendar" /> Calendário
           </button>
           <button className={`dashboard-tab${filter === 'dashboard' ? ' active' : ''}`} aria-pressed={filter === 'dashboard'} onClick={() => setFilter('dashboard')}>
-            📊 Dashboard
+            <HudIcon name="chart" /> Dashboard
           </button>
           <button className={filter === 'fasting' ? 'active' : ''} aria-pressed={filter === 'fasting'} onClick={() => setFilter('fasting')}>
-            ⏱️ Jejum{activeFast ? ' •' : ''}
+            <HudIcon name="timer" /> Jejum{activeFast ? ' •' : ''}
           </button>
           <button className={filter === 'nofap' ? 'active' : ''} aria-pressed={filter === 'nofap'} onClick={() => setFilter('nofap')}>
-            🚫 No fap{noFap ? ' •' : ''}
+            <HudIcon name="shield" /> No fap{noFap ? ' •' : ''}
           </button>
           <button className={filter === 'dailylog' ? 'active' : ''} aria-pressed={filter === 'dailylog'} onClick={() => setFilter('dailylog')}>
-            📓 Daily Log
+            <HudIcon name="book" /> Daily Log
           </button>
           <button className={filter === 'impediments' ? 'active' : ''} aria-pressed={filter === 'impediments'} onClick={() => setFilter('impediments')}>
-            ⚠️ Impedimentos{sprintImpediments.some(item => !item.resolved) ? ' •' : ''}
+            <HudIcon name="alert" /> Impedimentos{sprintImpediments.some(item => !item.resolved) ? ' •' : ''}
           </button>
           <button className={filter === 'timeclock' ? 'active' : ''} aria-pressed={filter === 'timeclock'} onClick={() => setFilter('timeclock')}>
-            🕒 Controle de Ponto
+            <HudIcon name="clock" /> Controle de Ponto
           </button>
           <button className={filter === 'clocks' ? 'active' : ''} aria-pressed={filter === 'clocks'} onClick={() => setFilter('clocks')}>
-            ⏱️ Relógios
+            <HudIcon name="timer" /> Relógios
           </button>
         </nav>
 
@@ -335,13 +336,13 @@ export default function App() {
           <>
             {todayQuests.length > 0 && (
               <div className="day-section">
-                <h2 className="day-section-title">📌 Hoje</h2>
+                <h2 className="day-section-title"><HudIcon name="pin" /> Hoje</h2>
                 <QuestList quests={todayQuests} highlightHard={highlightHardQuests} />
               </div>
             )}
             {tomorrowQuests.length > 0 && (
               <div className="day-section">
-                <h2 className="day-section-title">📅 Amanhã</h2>
+                <h2 className="day-section-title"><HudIcon name="calendar" /> Amanhã</h2>
                 <QuestList quests={tomorrowQuests} />
               </div>
             )}
@@ -359,7 +360,7 @@ export default function App() {
         {undoToastQuestId && (
           <div className="undo-toast">
             <div className="undo-toast-content">
-              <span className="undo-toast-msg">⚔️ Missão cumprida!</span>
+              <span className="undo-toast-msg"><HudIcon name="crest" /> Missão cumprida!</span>
               <button 
                 className="undo-btn" 
                 onClick={() => undoCompleteQuestAction(undoToastQuestId)}

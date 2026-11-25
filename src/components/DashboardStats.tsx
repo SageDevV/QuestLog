@@ -1,3 +1,4 @@
+import HudIcon from './HudIcon';
 import { useStore } from '../store';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 
@@ -10,12 +11,12 @@ export default function DashboardStats() {
   });
 
   const data = Object.keys(statsMap).map(key => ({
-    subject: key,
+    subject: key.replace(/^\S+\s/, ''),
     A: statsMap[key],
     fullMark: Math.max(...Object.values(statsMap)) + 2,
   }));
 
-  if (data.length === 0) return <div className="empty-msg" style={{marginTop:'40px'}}>Nenhum dado analítico por aqui. Vá lá e complete suas missões setadas com categorias! 📊</div>;
+  if (data.length === 0) return <div className="empty-msg" style={{marginTop:'40px'}}>Nenhum dado analítico por aqui. Vá lá e complete suas missões setadas com categorias! <HudIcon name="chart" /></div>;
 
   return (
     <div className="quest-card" style={{ padding: '20px', minHeight: '300px', margin: '20px 0', border: '1px solid rgba(0, 229, 255, 0.2)' }}>

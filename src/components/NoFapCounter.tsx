@@ -1,3 +1,4 @@
+import HudIcon from './HudIcon';
 import { useEffect, useState } from 'react';
 import { useStore } from '../store';
 import {
@@ -61,7 +62,7 @@ export default function NoFapCounter() {
   return (
     <div className="fasting">
       <section className="fasting-card">
-        <h2 className="fasting-title">🚫 No fap</h2>
+        <h2 className="fasting-title"><HudIcon name="shield" /> No fap</h2>
 
         <div className="nofap-counter" role="status" aria-label={`${days} ${days === 1 ? 'dia' : 'dias'} sem recaída`}>
           <span className="nofap-days">{days}</span>
@@ -72,7 +73,7 @@ export default function NoFapCounter() {
           <>
             <p className="fasting-hint nofap-center">Comece sua contagem de dias.</p>
             <div className="fasting-actions">
-              <button className="fasting-btn primary" onClick={startNoFap}>▶ Iniciar contagem</button>
+              <button className="fasting-btn primary" onClick={startNoFap}><HudIcon name="play" /> Iniciar contagem</button>
             </div>
           </>
         )}
@@ -82,7 +83,7 @@ export default function NoFapCounter() {
             <button className="fasting-btn danger" onClick={() => { setConfirmingReset(true); setEditing(false); }}>
               ↺ Reiniciar contagem
             </button>
-            <button className="fasting-btn" onClick={openEdit}>✏️ Ajustar data</button>
+            <button className="fasting-btn" onClick={openEdit}><HudIcon name="edit" /> Ajustar data</button>
           </div>
         )}
 

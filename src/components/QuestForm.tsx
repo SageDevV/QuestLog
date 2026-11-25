@@ -1,3 +1,4 @@
+import HudIcon from './HudIcon';
 import { useState } from 'react';
 import { QuestDifficulty, DIFFICULTY_CONFIG, RecurrenceType, QuestTag, QuestAgent, AGENT_CONFIG, Quest, ChecklistItem } from '../types';
 import { generateOccurrences, validateRecurrenceConfig } from '../recurrenceUtils';
@@ -78,7 +79,7 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
     else setOpen(false);
   };
 
-  if (!open) return <button className="new-quest-btn" onClick={() => setOpen(true)}>➕ Formatar Nova Missão</button>;
+  if (!open) return <button className="new-quest-btn" onClick={() => setOpen(true)}><HudIcon name="plus" /> Formatar Nova Missão</button>;
 
   return (
     <form className="quest-form" onSubmit={handleSubmit}>
@@ -87,7 +88,7 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
 
       <div className="checklist-editor">
         <div className="checklist-editor-heading">
-          <label>☑ Checklist da missão</label>
+          <label><HudIcon name="check" /> Checklist da missão</label>
           <span>Opcional</span>
         </div>
         <div className="checklist-add-row">
@@ -115,16 +116,16 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
       {formError && <div className="form-error">{formError}</div>}
 
       <div style={{display:'flex', gap:'8px', overflowX:'auto', padding:'10px 0', whiteSpace: 'nowrap'}}>
-        {TAGS.map(t => <button type="button" key={t} onClick={()=>setTag(t)} style={{padding:'6px 12px', background: tag === t ? '#4ade80':'rgba(255,255,255,0.05)', color:'#fff', border:'none', borderRadius:'20px', cursor:'pointer', fontSize:'0.85rem'}}>{t}</button>)}
+        {TAGS.map(t => <button type="button" key={t} onClick={()=>setTag(t)} style={{padding:'6px 12px', background: tag === t ? '#4ade80':'rgba(255,255,255,0.05)', color:'#fff', border:'none', borderRadius:'20px', cursor:'pointer', fontSize:'0.85rem'}}>{t.split(" ").slice(1).join(" ")}</button>)}
       </div>
 
       <div className="agent-label-selector">
-        <span style={{fontSize:'0.8rem', color:'var(--text-dim)', marginBottom:'4px', display:'block'}}>🤖 Executado por:</span>
+        <span style={{fontSize:'0.8rem', color:'var(--text-dim)', marginBottom:'4px', display:'block'}}><HudIcon name="chip" /> Executado por:</span>
         <div style={{display:'flex', gap:'6px', flexWrap:'wrap'}}>
           {AGENTS.map(a => {
             const acfg = AGENT_CONFIG[a];
             const isSelected = agentLabel === a;
-            return <button type="button" key={a} onClick={() => setAgentLabel(isSelected ? undefined : a)} className={`agent-label-btn ${isSelected ? 'selected' : ''}`} style={{padding:'5px 12px', background: isSelected ? acfg.bg : 'rgba(255,255,255,0.04)', color: isSelected ? acfg.color : 'var(--text-dim)', border: `1px solid ${isSelected ? acfg.color : 'rgba(255,255,255,0.08)'}`, borderRadius:'20px', cursor:'pointer', fontSize:'0.8rem', fontWeight: isSelected ? 600 : 400, transition:'all 0.2s'}}>{acfg.emoji} {a}</button>;
+            return <button type="button" key={a} onClick={() => setAgentLabel(isSelected ? undefined : a)} className={`agent-label-btn ${isSelected ? 'selected' : ''}`} style={{padding:'5px 12px', background: isSelected ? acfg.bg : 'rgba(255,255,255,0.04)', color: isSelected ? acfg.color : 'var(--text-dim)', border: `1px solid ${isSelected ? acfg.color : 'rgba(255,255,255,0.08)'}`, borderRadius:'20px', cursor:'pointer', fontSize:'0.8rem', fontWeight: isSelected ? 600 : 400, transition:'all 0.2s'}}><HudIcon name="chip" /> {a}</button>;
           })}
         </div>
       </div>
@@ -139,13 +140,13 @@ export default function QuestForm({ initialQuest, onCancel }: { initialQuest?: Q
       <div className="difficulty-selector">
         {(Object.keys(DIFFICULTY_CONFIG) as QuestDifficulty[]).map(d => {
           const cfg = DIFFICULTY_CONFIG[d];
-          return <button key={d} type="button" className={`diff-btn ${difficulty === d ? 'selected' : ''}`} style={{ borderColor: difficulty === d ? cfg.color : 'transparent' }} onClick={() => setDifficulty(d)}>{cfg.emoji} {cfg.label}<small>+{cfg.xp}XP</small></button>;
+          return <button key={d} type="button" className={`diff-btn ${difficulty === d ? 'selected' : ''}`} style={{ borderColor: difficulty === d ? cfg.color : 'transparent' }} onClick={() => setDifficulty(d)}><HudIcon name="rank" /> {cfg.label}<small>+{cfg.xp}XP</small></button>;
         })}
       </div>
       
       <div className="form-actions" style={{marginTop:'10px'}}>
         <button type="submit" className="submit-btn">
-          {initialQuest ? '💾 Salvar Alterações' : '🏹 Declarar Missão'}
+          <HudIcon name={initialQuest ? 'check' : 'missions'} /> {initialQuest ? 'Salvar Alterações' : 'Declarar Missão'}
         </button>
         <button type="button" className="cancel-btn" onClick={handleCancel}>Recuar</button>
       </div>

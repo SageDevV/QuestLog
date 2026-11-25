@@ -1,3 +1,4 @@
+import HudIcon from './HudIcon';
 import { useEffect, useMemo, useState } from 'react';
 import { useStore } from '../store';
 
@@ -91,7 +92,7 @@ export default function ClockTools() {
     <section className="clock-tools" aria-labelledby="clock-tools-title">
       <header className="clock-tools-header"><div><p>TIME SYSTEM // FOCUS CONTROL</p><h2 id="clock-tools-title">Relógios</h2><span>Crie timers, despertadores e acompanhe o tempo de foco.</span></div><b>{runningTimers.length} timer{runningTimers.length !== 1 ? 's' : ''} ativo{runningTimers.length !== 1 ? 's' : ''}</b></header>
 
-      {ringing.length > 0 && <div className="clock-alert" role="alert"><span>⚡ SINAL DE TEMPO CONCLUÍDO</span><button type="button" onClick={() => setRinging([])}>Confirmar</button></div>}
+      {ringing.length > 0 && <div className="clock-alert" role="alert"><span><HudIcon name="bolt" /> SINAL DE TEMPO CONCLUÍDO</span><button type="button" onClick={() => setRinging([])}>Confirmar</button></div>}
 
       <div className="clock-tools-grid">
         <div className="clock-panel"><h3>Timer</h3><form onSubmit={createTimer} className="clock-create-form"><input value={timerLabel} onChange={event => setTimerLabel(event.target.value)} placeholder="Nome do foco (opcional)" /><div><input type="number" min="1" value={timerMinutes} onChange={event => setTimerMinutes(event.target.value)} aria-label="Duração em minutos" /><span>minutos</span></div><button type="submit">+ Criar timer</button></form><div className="clock-item-list">{timers.length === 0 ? <p className="clock-empty">Nenhum timer criado.</p> : timers.map(timer => { const remaining = timer.endsAt ? Math.max(0, Math.ceil((timer.endsAt - now) / 1000)) : timer.remainingSeconds; return <article key={timer.id} className={`timer-item ${remaining === 0 ? 'finished' : ''}`}><div><span>{timer.label}</span><strong>{durationLabel(remaining)}</strong></div><div className="timer-actions">{timer.endsAt ? <button type="button" onClick={() => pauseTimer(timer.id)}>Pausar</button> : <button type="button" onClick={() => startTimer(timer.id)} disabled={remaining === 0}>Iniciar</button>}<button type="button" onClick={() => resetTimer(timer.id)}>↺</button><button type="button" onClick={() => deleteTimer(timer.id)}>×</button></div></article>; })}</div></div>

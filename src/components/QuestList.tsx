@@ -1,3 +1,4 @@
+import HudIcon from './HudIcon';
 import { useState } from 'react';
 import { Quest, DIFFICULTY_CONFIG, QuestAgent, AGENT_CONFIG, ChecklistItem } from '../types';
 import { useStore } from '../store';
@@ -21,7 +22,7 @@ export default function QuestList({ quests, highlightHard }: Props) {
   const [tempScheduledDate, setTempScheduledDate] = useState('');
   const [applyDateToSeries, setApplyDateToSeries] = useState(false);
 
-  if (quests.length === 0) return <div className="empty-msg">Nenhum rastro encontrado... O horizonte está limpo e sereno! 🗺️</div>;
+  if (quests.length === 0) return <div className="empty-msg">Nenhum rastro encontrado... O horizonte está limpo e sereno! <HudIcon name="pin" /></div>;
 
   const handleStartEdit = (quest: Quest) => {
     setEditingId(quest.id);
@@ -91,19 +92,19 @@ export default function QuestList({ quests, highlightHard }: Props) {
             <div className="quest-card-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                 <span className="quest-difficulty" style={{ color: cfg.color }}>
-                  {cfg.emoji} {cfg.label}
+                  <HudIcon name="rank" /> {cfg.label}
                 </span>
-                {quest.tag && <span style={{background:'rgba(255,255,255,0.1)', padding:'2px 8px', borderRadius:'10px', fontSize:'0.75rem', color:'#fff'}}>{quest.tag}</span>}
-                {quest.agentLabel && (() => { const acfg = AGENT_CONFIG[quest.agentLabel]; return <span className="agent-badge" style={{background: acfg.bg, color: acfg.color, border: `1px solid ${acfg.color}`, padding:'2px 8px', borderRadius:'12px', fontSize:'0.7rem', fontWeight:600, whiteSpace:'nowrap'}}>{acfg.emoji} {quest.agentLabel}</span>; })()}
+                {quest.tag && <span style={{background:'rgba(255,255,255,0.1)', padding:'2px 8px', borderRadius:'10px', fontSize:'0.75rem', color:'#fff'}}>{quest.tag.split(' ').slice(1).join(' ')}</span>}
+                {quest.agentLabel && (() => { const acfg = AGENT_CONFIG[quest.agentLabel]; return <span className="agent-badge" style={{background: acfg.bg, color: acfg.color, border: `1px solid ${acfg.color}`, padding:'2px 8px', borderRadius:'12px', fontSize:'0.7rem', fontWeight:600, whiteSpace:'nowrap'}}><HudIcon name="chip" /> {quest.agentLabel}</span>; })()}
               </div>
-              <span className="quest-reward">+{cfg.xp} XP | +{cfg.gold} ⚡</span>
+              <span className="quest-reward">+{cfg.xp} XP | +{cfg.gold} <HudIcon name="bolt" /></span>
             </div>
             
             <h3 style={{display:'flex', alignItems:'center', gap:'8px'}}>
-              {quest.title} {isRecurrent && <span title="Missão Recorrente" style={{fontSize:'0.9rem', opacity:0.5}}>🔄</span>}
+              {quest.title} {isRecurrent && <span title="Missão Recorrente" style={{fontSize:'0.9rem', opacity:0.5}}><HudIcon name="repeat" /></span>}
               {!quest.completed && !isEditing && (
                 <button className="edit-icon-btn" onClick={() => handleStartEdit(quest)} title={quest.description ? 'Editar Descrição' : 'Adicionar Descrição'}>
-                  ✏️
+                  <HudIcon name="edit" />
                 </button>
               )}
               {quest.progress !== undefined && quest.progress > 0 && !quest.completed && !isEditing && (
@@ -145,7 +146,7 @@ export default function QuestList({ quests, highlightHard }: Props) {
                     placeholder="Descreva os detalhes da missão..."
                   />
                   <div className="checklist-editor quick-checklist-editor">
-                    <div className="checklist-editor-heading"><label>☑ Checklist</label><span>Itens da missão</span></div>
+                    <div className="checklist-editor-heading"><label><HudIcon name="check" /> Checklist</label><span>Itens da missão</span></div>
                     <div className="checklist-add-row">
                       <input value={newChecklistItem} onChange={e => setNewChecklistItem(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTemporaryChecklistItem(); } }} placeholder="Novo item..." />
                       <button type="button" className="checklist-add-button" onClick={addTemporaryChecklistItem}>+ Adicionar</button>
@@ -158,12 +159,12 @@ export default function QuestList({ quests, highlightHard }: Props) {
                   </div>
 
                   <div style={{marginTop:'10px'}}>
-                    <span style={{fontSize:'0.8rem', color:'var(--text-dim)', display:'block', marginBottom:'6px'}}>🤖 Executado por:</span>
+                    <span style={{fontSize:'0.8rem', color:'var(--text-dim)', display:'block', marginBottom:'6px'}}><HudIcon name="chip" /> Executado por:</span>
                     <div style={{display:'flex', gap:'5px', flexWrap:'wrap'}}>
                       {(['Claude','Codex','Gemini','Kiro','Gamma','Manual'] as QuestAgent[]).map(a => {
                         const acfg = AGENT_CONFIG[a];
                         const isSel = tempAgent === a;
-                        return <button key={a} type="button" onClick={() => setTempAgent(isSel ? undefined : a)} style={{padding:'4px 10px', background: isSel ? acfg.bg : 'rgba(255,255,255,0.04)', color: isSel ? acfg.color : 'var(--text-dim)', border: `1px solid ${isSel ? acfg.color : 'rgba(255,255,255,0.08)'}`, borderRadius:'16px', cursor:'pointer', fontSize:'0.75rem', fontWeight: isSel ? 600 : 400, transition:'all 0.2s'}}>{acfg.emoji} {a}</button>;
+                        return <button key={a} type="button" onClick={() => setTempAgent(isSel ? undefined : a)} style={{padding:'4px 10px', background: isSel ? acfg.bg : 'rgba(255,255,255,0.04)', color: isSel ? acfg.color : 'var(--text-dim)', border: `1px solid ${isSel ? acfg.color : 'rgba(255,255,255,0.08)'}`, borderRadius:'16px', cursor:'pointer', fontSize:'0.75rem', fontWeight: isSel ? 600 : 400, transition:'all 0.2s'}}><HudIcon name="chip" /> {a}</button>;
                       })}
                     </div>
                   </div>
@@ -172,7 +173,7 @@ export default function QuestList({ quests, highlightHard }: Props) {
                 <>
                   {quest.description && <p className="quest-desc">{quest.description}</p>}
                   {checklist.length > 0 && <div className="quest-checklist">
-                    <div className="quest-checklist-title">☑ Checklist <span>{completedChecklistItems}/{checklist.length}</span></div>
+                    <div className="quest-checklist-title"><HudIcon name="check" /> Checklist <span>{completedChecklistItems}/{checklist.length}</span></div>
                     {checklist.map(item => <label key={item.id} className={`quest-checklist-item ${item.completed ? 'done' : ''}`}>
                       <input type="checkbox" checked={item.completed} disabled={quest.completed} onChange={() => updateQuest(quest.id, { checklist: checklist.map(entry => entry.id === item.id ? { ...entry, completed: !entry.completed } : entry) })} />
                       <span>{item.title}</span>
@@ -183,8 +184,8 @@ export default function QuestList({ quests, highlightHard }: Props) {
             </div>
 
             <div className="quest-actions" style={{marginTop:'12px'}}>
-              {!quest.completed && <button className="complete-btn" onClick={() => completeQuestAction(quest.id)}>✔ Finalizar</button>}
-              <button className="delete-btn" onClick={() => deleteQuest(quest.id)}>🗑️ Lixo</button>
+              {!quest.completed && <button className="complete-btn" onClick={() => completeQuestAction(quest.id)}><HudIcon name="check" /> Finalizar</button>}
+              <button className="delete-btn" onClick={() => deleteQuest(quest.id)}><HudIcon name="trash" /> Lixo</button>
               {isRecurrent && <button className="delete-btn" onClick={() => { if(confirm('Destruir toda a CADEIA TEMPORAL DE REPETIÇÕES dessa missão?')) deleteAllMatching(quest.id); }}>Aniquilar Série</button>}
             </div>
           </div>

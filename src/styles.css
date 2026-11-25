@@ -1359,7 +1359,6 @@ body {
 .music-toggle.is-playing .music-signal i:nth-child(3) { animation-delay: 0.35s; }
 @keyframes music-signal-pulse { from { transform: scaleY(0.45); opacity: 0.55; } to { transform: scaleY(1); opacity: 1; } }
 @media (max-width: 520px) { .music-toggle { right: 14px; bottom: 14px; width: 48px; padding: 0; justify-content: center; } .music-toggle-label, .music-signal { display: none; } }
-}
 
 /* ===== Quest Calendar ===== */
 .quest-calendar {

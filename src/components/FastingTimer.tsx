@@ -1,3 +1,4 @@
+import HudIcon from './HudIcon';
 import { useEffect, useRef, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { useStore } from '../store';
@@ -152,7 +153,7 @@ export default function FastingTimer() {
   return (
     <div className="fasting">
       <section className={`fasting-card${reached ? ' reached' : ''}`}>
-        <h2 className="fasting-title">⏱️ Jejum Intermitente</h2>
+        <h2 className="fasting-title"><HudIcon name="timer" /> Jejum Intermitente</h2>
 
         <div className="fasting-protocols" role="radiogroup" aria-label="Protocolo de jejum">
           {FAST_PROTOCOLS.map(p => (
@@ -248,22 +249,22 @@ export default function FastingTimer() {
 
         {reached && (
           <div className="fasting-achievement" role="status">
-            🏆 Meta atingida! Você completou {protocolLabel(protocolId, targetHours)}. Cada minuto extra é bônus.
+            <HudIcon name="rank" /> Meta atingida! Você completou {protocolLabel(protocolId, targetHours)}. Cada minuto extra é bônus.
           </div>
         )}
 
         <div className="fasting-actions">
           {!activeFast && (
             <button className="fasting-btn primary" onClick={() => startFast(protocolId, targetHours)}>
-              ▶ Iniciar jejum
+              <HudIcon name="play" /> Iniciar jejum
             </button>
           )}
           {activeFast && !confirmingEnd && (
             <>
               <button className="fasting-btn danger" onClick={() => { setConfirmingEnd(true); setEditing(false); }}>
-                ⏹ Encerrar jejum
+                <HudIcon name="stop" /> Encerrar jejum
               </button>
-              <button className="fasting-btn" onClick={openEdit}>✏️ Ajustar horários</button>
+              <button className="fasting-btn" onClick={openEdit}><HudIcon name="edit" /> Ajustar horários</button>
             </>
           )}
         </div>
@@ -339,7 +340,7 @@ export default function FastingTimer() {
       <section className="fasting-card">
         <h3 className="fasting-subtitle">
           Histórico
-          <span className="fasting-streak" title="Dias seguidos com jejum concluído">🔥 {streak} {streak === 1 ? 'dia seguido' : 'dias seguidos'}</span>
+          <span className="fasting-streak" title="Dias seguidos com jejum concluído"><HudIcon name="bolt" /> {streak} {streak === 1 ? 'dia seguido' : 'dias seguidos'}</span>
         </h3>
         <div className="fasting-week">
           {week.map(d => (
@@ -350,7 +351,7 @@ export default function FastingTimer() {
                 role="img"
                 aria-label={d.status === 'completed' ? 'Jejum concluído' : d.status === 'partial' ? 'Jejum parcial' : 'Sem jejum'}
               >
-                {d.status === 'completed' ? '✅' : d.status === 'partial' ? '◐' : '·'}
+                {d.status === 'completed' ? <HudIcon name="check" /> : d.status === 'partial' ? '◐' : '·'}
               </span>
               <span className="fasting-day-num">{d.date.getDate()}</span>
             </div>
@@ -362,7 +363,7 @@ export default function FastingTimer() {
           <ul className="fasting-history">
             {recent.map(r => (
               <li key={r.id}>
-                <span>{isFastCompleted(r) ? '✅' : '◐'} {protocolLabel(r.protocolId, r.targetHours)}</span>
+                <span>{isFastCompleted(r) ? <HudIcon name="check" /> : '◐'} {protocolLabel(r.protocolId, r.targetHours)}</span>
                 <span>{formatDurationShort(r.endedAt - r.startedAt)} de {formatHours(r.targetHours)}h</span>
                 <span className="fasting-hint">{new Date(r.endedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</span>
               </li>

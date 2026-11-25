@@ -1,3 +1,4 @@
+import HudIcon from './HudIcon';
 import { useState } from 'react';
 import { Quest, DIFFICULTY_CONFIG, AGENT_CONFIG, QuestAgent } from '../types';
 import { getDaysInMonth, getFirstDayOfWeek, formatMonthYear, groupQuestsByDay } from '../calendarUtils';
@@ -81,9 +82,9 @@ export default function QuestCalendar({ quests, onComplete, onDelete, onDeleteSe
   return (
     <div className="quest-calendar">
       <div className="calendar-header">
-        <button onClick={goToPrevMonth} aria-label="Mês anterior">◀</button>
+        <button onClick={goToPrevMonth} aria-label="Mês anterior"><HudIcon name="back" /></button>
         <h2>{formatMonthYear(currentYear, currentMonth)}</h2>
-        <button onClick={goToNextMonth} aria-label="Próximo mês">▶</button>
+        <button onClick={goToNextMonth} aria-label="Próximo mês"><HudIcon name="play" /></button>
       </div>
 
       <div className="calendar-grid">
@@ -135,7 +136,7 @@ export default function QuestCalendar({ quests, onComplete, onDelete, onDeleteSe
                         placeholder="Descrição..."
                       />
                       <div className="agent-label-selector" style={{ marginTop: '8px' }}>
-                        <span style={{fontSize:'0.75rem', color:'var(--text-dim)', marginBottom:'4px', display:'block'}}>🤖 Executado por:</span>
+                        <span style={{fontSize:'0.75rem', color:'var(--text-dim)', marginBottom:'4px', display:'block'}}><HudIcon name="chip" /> Executado por:</span>
                         <div style={{display:'flex', gap:'4px', flexWrap:'wrap'}}>
                           {AGENTS.map(a => {
                             const acfg = AGENT_CONFIG[a];
@@ -158,7 +159,7 @@ export default function QuestCalendar({ quests, onComplete, onDelete, onDeleteSe
                                   transition:'all 0.2s'
                                 }}
                               >
-                                {acfg.emoji} {a}
+                                <HudIcon name="chip" /> {a}
                               </button>
                             );
                           })}
@@ -171,13 +172,13 @@ export default function QuestCalendar({ quests, onComplete, onDelete, onDeleteSe
                     </div>
                   ) : (
                     <>
-                      <span className="day-panel-quest-status">{quest.completed ? '✅' : '📋'}</span>
+                      <span className="day-panel-quest-status"><HudIcon name={quest.completed ? 'check' : 'missions'} /></span>
                       <span className="day-panel-quest-title">{quest.title}</span>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span className="day-panel-quest-difficulty">{cfg.emoji} {cfg.label}</span>
-                        {quest.agentLabel && (() => { const acfg = AGENT_CONFIG[quest.agentLabel]; return <span className="agent-badge" style={{background: acfg.bg, color: acfg.color, border: `1px solid ${acfg.color}`, padding:'2px 6px', borderRadius:'10px', fontSize:'0.65rem', fontWeight:600}}>{acfg.emoji} {quest.agentLabel}</span>; })()}
+                        <span className="day-panel-quest-difficulty"><HudIcon name="rank" /> {cfg.label}</span>
+                        {quest.agentLabel && (() => { const acfg = AGENT_CONFIG[quest.agentLabel]; return <span className="agent-badge" style={{background: acfg.bg, color: acfg.color, border: `1px solid ${acfg.color}`, padding:'2px 6px', borderRadius:'10px', fontSize:'0.65rem', fontWeight:600}}><HudIcon name="chip" /> {quest.agentLabel}</span>; })()}
                       </div>
-                      <span className="day-panel-quest-reward">+{cfg.xp}XP +{cfg.gold}⚡</span>
+                      <span className="day-panel-quest-reward">+{cfg.xp}XP +{cfg.gold}<HudIcon name="bolt" /></span>
                       
                       <div className="day-panel-actions">
                         {!quest.completed && (
@@ -186,7 +187,7 @@ export default function QuestCalendar({ quests, onComplete, onDelete, onDeleteSe
                             onClick={(e) => { e.stopPropagation(); handleStartEdit(quest); }}
                             title="Editar Missão"
                           >
-                            ✏️
+                            <HudIcon name="edit" />
                           </button>
                         )}
                         {!quest.completed && (
@@ -195,7 +196,7 @@ export default function QuestCalendar({ quests, onComplete, onDelete, onDeleteSe
                             onClick={(e) => { e.stopPropagation(); onComplete(quest.id); }}
                             title="Completar Missão"
                           >
-                            ✅
+                            <HudIcon name="check" />
                           </button>
                         )}
                         <button
@@ -203,7 +204,7 @@ export default function QuestCalendar({ quests, onComplete, onDelete, onDeleteSe
                           onClick={(e) => { e.stopPropagation(); if(confirm('Excluir esta missão?')) onDelete(quest.id); }}
                           title="Excluir Missão"
                         >
-                          🗑️
+                          <HudIcon name="trash" />
                         </button>
                         {quest.recurrenceType && quest.recurrenceType !== 'single' && (
                           <button
@@ -211,7 +212,7 @@ export default function QuestCalendar({ quests, onComplete, onDelete, onDeleteSe
                             onClick={(e) => { e.stopPropagation(); if(confirm('Destruir toda a CADEIA TEMPORAL desta série?')) onDeleteSeries(quest.id); }}
                             title="Aniquilar Série"
                           >
-                            🔄🗑️
+                            <HudIcon name="repeat" /><HudIcon name="trash" />
                           </button>
                         )}
                       </div>

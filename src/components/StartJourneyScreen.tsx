@@ -1,3 +1,4 @@
+import HudIcon from './HudIcon';
 import { unlockWarningAudio } from './WarningScreen';
 
 export default function StartJourneyScreen({ onStart }: { onStart: () => void }) {
@@ -20,7 +21,7 @@ export default function StartJourneyScreen({ onStart }: { onStart: () => void })
 
       <div className="login-card">
         <div className="login-logo">
-          <span className="login-logo-icon">⚔️</span>
+          <span className="login-logo-icon"><HudIcon name="crest" /></span>
           <h1 className="login-title">Bem-vindo de volta!</h1>
           <p className="login-subtitle">Sua guilda aguarda suas próximas ações.</p>
         </div>
@@ -38,7 +39,7 @@ export default function StartJourneyScreen({ onStart }: { onStart: () => void })
             letterSpacing: '1px'
           }}
         >
-          ▶ INICIAR JORNADA
+          <HudIcon name="play" /> INICIAR JORNADA
         </button>
       </div>
     </div>

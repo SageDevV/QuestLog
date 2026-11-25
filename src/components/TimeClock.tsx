@@ -1,3 +1,4 @@
+import HudIcon from './HudIcon';
 import { useMemo } from 'react';
 import { useStore } from '../store';
 
@@ -42,7 +43,7 @@ export default function TimeClock() {
       </div>
 
       <a className="time-clock-action" href={TIME_CLOCK_URL} onClick={recordPortalAccess}>
-        <span className="time-clock-action-icon" aria-hidden="true">◷</span>
+        <span className="time-clock-action-icon" aria-hidden="true"><HudIcon name="clock" /></span>
         <span><strong>Registrar ponto no Portal Senior</strong><small>Abrir marcação oficial</small></span>
         <b aria-hidden="true">↗</b>
       </a>
